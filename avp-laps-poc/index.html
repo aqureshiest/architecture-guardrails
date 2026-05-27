@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LAPS + AVP — Architecture Diagram</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 32px 72px;
+    }
+
+    h1 {
+      font-size: 17px;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
+    .sub {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 52px;
+      text-align: center;
+    }
+
+    svg {
+      width: 100%;
+      max-width: 1200px;
+      height: auto;
+    }
+
+    .legend {
+      display: flex;
+      gap: 28px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin: 56px 0 20px;
+      text-align: center;
+    }
+
+    .policies {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .policy-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .policy-header {
+      padding: 11px 16px;
+      background: #f8fafc;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .policy-id {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #eff6ff;
+      color: #2563eb;
+      border: 1px solid #93c5fd;
+    }
+
+    .policy-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .cedar {
+      padding: 14px 16px;
+      font-family: 'SF Mono', ui-monospace, monospace;
+      font-size: 11.5px;
+      line-height: 1.75;
+      white-space: pre;
+      overflow-x: auto;
+      background: #fafafa;
+      color: #475569;
+    }
+
+    .kw  { color: #7c3aed; }
+    .typ { color: #2563eb; }
+    .val { color: #16a34a; }
+    .op  { color: #94a3b8; }
+    .cm  { color: #94a3b8; font-style: italic; }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+<h1>LAPS Artifact Authorization — Architecture Overview</h1>
+<p class="sub">How Amazon Verified Permissions controls what each service can read from LAPS</p>
+
+<svg viewBox="0 0 1260 760" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arr-gray"   markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="#94a3b8"/></marker>
+    <marker id="arr-blue"   markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="#3b82f6"/></marker>
+    <marker id="arr-purple" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="#8b5cf6"/></marker>
+    <marker id="arr-red"    markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="#dc2626"/></marker>
+    <marker id="arr-green"  markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L0,7 L7,3.5 z" fill="#16a34a"/></marker>
+
+    <filter id="s1" x="-8%" y="-8%" width="116%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+
+  <!-- ═══ COLUMN BACKGROUNDS ══════════════════════════════════════ -->
+
+  <!-- Callers — wider -->
+  <rect x="20" y="20" width="270" height="720" rx="14" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="155" y="46" text-anchor="middle" font-size="11" font-weight="600" letter-spacing="0.09em" fill="#94a3b8">CALLERS</text>
+
+  <!-- LAPS -->
+  <rect x="430" y="20" width="240" height="720" rx="14" fill="#eff6ff" stroke="#bfdbfe" stroke-width="1"/>
+  <text x="550" y="46" text-anchor="middle" font-size="11" font-weight="600" letter-spacing="0.09em" fill="#3b82f6">LAPS</text>
+
+  <!-- AVP -->
+  <rect x="780" y="20" width="230" height="720" rx="14" fill="#faf5ff" stroke="#ddd6fe" stroke-width="1"/>
+  <text x="895" y="46" text-anchor="middle" font-size="11" font-weight="600" letter-spacing="0.09em" fill="#7c3aed">AMAZON VERIFIED PERMISSIONS</text>
+
+  <!-- DB -->
+  <rect x="1110" y="20" width="130" height="720" rx="14" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1"/>
+  <text x="1175" y="46" text-anchor="middle" font-size="11" font-weight="600" letter-spacing="0.09em" fill="#16a34a">DB</text>
+
+
+  <!-- ═══ LAPS PIPELINE ═══════════════════════════════════════════ -->
+
+  <rect x="448" y="68" width="204" height="54" rx="9" fill="#fff" stroke="#bfdbfe" stroke-width="1.5" filter="url(#s1)"/>
+  <text x="550" y="91" text-anchor="middle" font-size="12" font-weight="600" fill="#1e40af">authenticatorComposer</text>
+  <text x="550" y="108" text-anchor="middle" font-size="11" fill="#64748b">token → service identity</text>
+
+  <line x1="550" y1="122" x2="550" y2="148" stroke="#bfdbfe" stroke-width="1.5" marker-end="url(#arr-blue)"/>
+
+  <rect x="448" y="150" width="204" height="54" rx="9" fill="#fff" stroke="#bfdbfe" stroke-width="1.5" filter="url(#s1)"/>
+  <text x="550" y="173" text-anchor="middle" font-size="12" font-weight="600" fill="#1e40af">AVP Authorization</text>
+  <text x="550" y="190" text-anchor="middle" font-size="11" fill="#64748b">isAuthorized() per artifact</text>
+
+  <line x1="550" y1="204" x2="550" y2="230" stroke="#bfdbfe" stroke-width="1.5" marker-end="url(#arr-blue)"/>
+
+  <rect x="448" y="232" width="204" height="54" rx="9" fill="#fff" stroke="#bfdbfe" stroke-width="1.5" filter="url(#s1)"/>
+  <text x="550" y="255" text-anchor="middle" font-size="12" font-weight="600" fill="#1e40af">Field Stripping</text>
+  <text x="550" y="272" text-anchor="middle" font-size="11" fill="#64748b">remove SSN from restricted</text>
+
+  <line x1="550" y1="286" x2="550" y2="312" stroke="#bfdbfe" stroke-width="1.5" marker-end="url(#arr-blue)"/>
+
+  <rect x="448" y="314" width="204" height="54" rx="9" fill="#fff" stroke="#bfdbfe" stroke-width="1.5" filter="url(#s1)"/>
+  <text x="550" y="337" text-anchor="middle" font-size="12" font-weight="600" fill="#1e40af">Scoped Response</text>
+  <text x="550" y="354" text-anchor="middle" font-size="11" fill="#64748b">filtered artifact payload</text>
+
+
+  <!-- ═══ AVP POLICY STORE ════════════════════════════════════════ -->
+
+  <rect x="798" y="68" width="194" height="200" rx="10" fill="#fff" stroke="#ddd6fe" stroke-width="1.5" filter="url(#s1)"/>
+  <text x="895" y="92" text-anchor="middle" font-size="12" font-weight="600" fill="#6d28d9">Policy Store</text>
+
+  <rect x="810" y="104" width="170" height="22" rx="5" fill="#f5f3ff"/>
+  <text x="895" y="119" text-anchor="middle" font-size="10.5" fill="#6d28d9">P-001  LDS → all tiers</text>
+
+  <rect x="810" y="132" width="170" height="22" rx="5" fill="#f5f3ff"/>
+  <text x="895" y="147" text-anchor="middle" font-size="10.5" fill="#6d28d9">P-002  LCG → sensitive + safe</text>
+
+  <rect x="810" y="160" width="170" height="22" rx="5" fill="#f5f3ff"/>
+  <text x="895" y="175" text-anchor="middle" font-size="10.5" fill="#6d28d9">P-003  AFS → safe only</text>
+
+  <rect x="810" y="188" width="170" height="22" rx="5" fill="#f5f3ff"/>
+  <text x="895" y="203" text-anchor="middle" font-size="10.5" fill="#6d28d9">P-004  DMS → safe + denial_tags</text>
+
+  <rect x="810" y="216" width="170" height="22" rx="5" fill="#f5f3ff"/>
+  <text x="895" y="231" text-anchor="middle" font-size="10.5" fill="#6d28d9">P-005  default → DENY</text>
+
+  <!-- ALLOW / DENY badges -->
+  <rect x="810" y="248" width="70" height="28" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+  <text x="845" y="266" text-anchor="middle" font-size="11" font-weight="700" fill="#16a34a">ALLOW</text>
+
+  <rect x="898" y="248" width="62" height="28" rx="6" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
+  <text x="929" y="266" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">DENY</text>
+
+  <!-- LAPS ↔ AVP -->
+  <line x1="652" y1="177" x2="795" y2="177" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-purple)"/>
+  <text x="724" y="169" text-anchor="middle" font-size="10" fill="#7c3aed">isAuthorized()</text>
+
+  <line x1="795" y1="262" x2="652" y2="255" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr-purple)"/>
+  <text x="724" y="272" text-anchor="middle" font-size="10" fill="#7c3aed">ALLOW / DENY</text>
+
+
+  <!-- ═══ 403 DENIED BOX ═══════════════════════════════════════════ -->
+
+  <rect x="800" y="370" width="190" height="80" rx="9" fill="#fef2f2" stroke="#fca5a5" stroke-width="1.5"/>
+  <text x="895" y="398" text-anchor="middle" font-size="13" font-weight="700" fill="#dc2626">403 Denied</text>
+  <text x="895" y="420" text-anchor="middle" font-size="10" fill="#b91c1c">credit_report requested by AFS</text>
+  <text x="895" y="436" text-anchor="middle" font-size="10" fill="#b91c1c">fico_score requested by DMS</text>
+
+  <line x1="895" y1="296" x2="895" y2="367" stroke="#fca5a5" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr-red)"/>
+  <text x="916" y="336" font-size="10" fill="#dc2626">no matching policy</text>
+
+
+  <!-- ═══ DATABASE ════════════════════════════════════════════════ -->
+
+  <rect x="1122" y="68" width="106" height="240" rx="10" fill="#fff" stroke="#bbf7d0" stroke-width="1.5" filter="url(#s1)"/>
+  <text x="1175" y="92" text-anchor="middle" font-size="11" font-weight="600" fill="#15803d">artifacts</text>
+
+  <rect x="1130" y="104" width="90" height="52" rx="5" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+  <text x="1175" y="123" text-anchor="middle" font-size="9.5" font-weight="600" fill="#dc2626">RESTRICTED</text>
+  <text x="1175" y="138" text-anchor="middle" font-size="9" fill="#64748b">credit_report</text>
+  <text x="1175" y="151" text-anchor="middle" font-size="9" fill="#64748b">+ SSN</text>
+
+  <rect x="1130" y="163" width="90" height="52" rx="5" fill="#fffbeb" stroke="#fcd34d" stroke-width="1"/>
+  <text x="1175" y="182" text-anchor="middle" font-size="9.5" font-weight="600" fill="#d97706">SENSITIVE</text>
+  <text x="1175" y="197" text-anchor="middle" font-size="9" fill="#64748b">fico, income</text>
+  <text x="1175" y="210" text-anchor="middle" font-size="9" fill="#64748b">assets, dti…</text>
+
+  <rect x="1130" y="222" width="90" height="52" rx="5" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+  <text x="1175" y="241" text-anchor="middle" font-size="9.5" font-weight="600" fill="#16a34a">SAFE</text>
+  <text x="1175" y="256" text-anchor="middle" font-size="9" fill="#64748b">model_version</text>
+  <text x="1175" y="269" text-anchor="middle" font-size="9" fill="#64748b">price_curve…</text>
+
+  <!-- LAPS → DB -->
+  <line x1="652" y1="341" x2="1118" y2="200" stroke="#86efac" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arr-green)"/>
+  <text x="900" y="330" text-anchor="middle" font-size="10" fill="#16a34a">query artifacts</text>
+
+
+  <!-- ═══ CALLERS ══════════════════════════════════════════════════ -->
+
+  <!-- LDS -->
+  <rect x="36" y="80" width="236" height="64" rx="9" fill="#fff" stroke="#fca5a5" stroke-width="2" filter="url(#s1)"/>
+  <text x="154" y="107" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">Lending Decisioning</text>
+  <text x="154" y="126" text-anchor="middle" font-size="10.5" fill="#dc2626">LDS · all tiers incl. SSN</text>
+
+  <!-- LCG -->
+  <rect x="36" y="220" width="236" height="64" rx="9" fill="#fff" stroke="#fcd34d" stroke-width="2" filter="url(#s1)"/>
+  <text x="154" y="247" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">Lending Checkout</text>
+  <text x="154" y="266" text-anchor="middle" font-size="10.5" fill="#d97706">LCG · sensitive + safe</text>
+
+  <!-- AFS -->
+  <rect x="36" y="360" width="236" height="64" rx="9" fill="#fff" stroke="#fcd34d" stroke-width="2" filter="url(#s1)"/>
+  <text x="154" y="387" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">Apply Flow</text>
+  <text x="154" y="406" text-anchor="middle" font-size="10.5" fill="#d97706">AFS · safe only</text>
+
+  <!-- DMS -->
+  <rect x="36" y="500" width="236" height="64" rx="9" fill="#fff" stroke="#86efac" stroke-width="2" filter="url(#s1)"/>
+  <text x="154" y="527" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">Declined Marketplace</text>
+  <text x="154" y="546" text-anchor="middle" font-size="10.5" fill="#16a34a">DMS · safe + denial_tags</text>
+
+  <!-- Internal Tools -->
+  <rect x="36" y="620" width="236" height="64" rx="9" fill="#fff" stroke="#fca5a5" stroke-width="2" filter="url(#s1)"/>
+  <text x="154" y="647" text-anchor="middle" font-size="13" font-weight="600" fill="#0f172a">Internal Tools</text>
+  <text x="154" y="666" text-anchor="middle" font-size="10.5" fill="#ea580c">Admin · all tiers, SSN stripped</text>
+
+
+  <!-- ═══ REQUEST ARROW ════════════════════════════════════════════ -->
+
+  <line x1="272" y1="112" x2="445" y2="95" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#arr-gray)"/>
+  <text x="359" y="95" text-anchor="middle" font-size="10" fill="#94a3b8">Bearer S2S token</text>
+
+  <!-- connector lines from other callers -->
+  <line x1="272" y1="252" x2="360" y2="252" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="360" y1="112" x2="360" y2="252" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <line x1="272" y1="392" x2="360" y2="392" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="360" y1="112" x2="360" y2="392" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <line x1="272" y1="532" x2="360" y2="532" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="360" y1="112" x2="360" y2="532" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <line x1="272" y1="652" x2="360" y2="652" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="360" y1="112" x2="360" y2="652" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,2"/>
+
+
+  <!-- ═══ FOOTER LABELS ════════════════════════════════════════════ -->
+  <text x="155"  y="710" text-anchor="middle" font-size="10" fill="#94a3b8">5 S2S services</text>
+  <text x="550"  y="710" text-anchor="middle" font-size="10" fill="#3b82f6">GET /v1/artifacts/:type/:id/:group</text>
+  <text x="895"  y="710" text-anchor="middle" font-size="10" fill="#7c3aed">Cedar policy evaluation</text>
+  <text x="1175" y="710" text-anchor="middle" font-size="10" fill="#16a34a">PostgreSQL</text>
+
+</svg>
+
+
+
+<p class="section-title">Cedar Policies — AVP Policy Store</p>
+
+<div class="policies">
+
+  <div class="policy-card">
+    <div class="policy-header">
+      <span class="policy-id">P-001</span>
+      <span class="policy-title">LDS reads all tiers</span>
+    </div>
+    <div class="cedar"><span class="cm">// Only service permitted to read restricted</span>
+<span class="kw">permit</span> (
+  <span class="kw">principal</span> <span class="op">==</span> <span class="typ">Service</span>::<span class="val">"lending-decisioning-service"</span>,
+  <span class="kw">action</span>    <span class="op">==</span> <span class="typ">Action</span>::<span class="val">"ReadArtifact"</span>,
+  <span class="kw">resource</span>  <span class="op">in</span> <span class="typ">ArtifactTier</span>::<span class="val">"restricted"</span>
+);</div>
+  </div>
+
+  <div class="policy-card">
+    <div class="policy-header">
+      <span class="policy-id">P-002</span>
+      <span class="policy-title">LCG reads sensitive + safe</span>
+    </div>
+    <div class="cedar"><span class="cm">// Checkout: FICO, income, rates — no bureau data</span>
+<span class="kw">permit</span> (
+  <span class="kw">principal</span> <span class="op">==</span> <span class="typ">Service</span>::<span class="val">"lending-checkout-gateway"</span>,
+  <span class="kw">action</span>    <span class="op">==</span> <span class="typ">Action</span>::<span class="val">"ReadArtifact"</span>,
+  <span class="kw">resource</span>  <span class="op">in</span> <span class="typ">ArtifactTier</span>::<span class="val">"sensitive"</span>
+);</div>
+  </div>
+
+  <div class="policy-card">
+    <div class="policy-header">
+      <span class="policy-id">P-003</span>
+      <span class="policy-title">AFS reads safe only</span>
+    </div>
+    <div class="cedar"><span class="cm">// Apply Flow: no financial PII needed</span>
+<span class="kw">permit</span> (
+  <span class="kw">principal</span> <span class="op">==</span> <span class="typ">Service</span>::<span class="val">"apply-flow-service"</span>,
+  <span class="kw">action</span>    <span class="op">==</span> <span class="typ">Action</span>::<span class="val">"ReadArtifact"</span>,
+  <span class="kw">resource</span>  <span class="op">in</span> <span class="typ">ArtifactTier</span>::<span class="val">"safe"</span>
+);</div>
+  </div>
+
+  <div class="policy-card">
+    <div class="policy-header">
+      <span class="policy-id">P-004</span>
+      <span class="policy-title">DMS reads safe + denial_tags</span>
+    </div>
+    <div class="cedar"><span class="cm">// Declined Marketplace: routing data only</span>
+<span class="kw">permit</span> (
+  <span class="kw">principal</span> <span class="op">==</span> <span class="typ">Service</span>::<span class="val">"declined-marketplace-service"</span>,
+  <span class="kw">action</span>    <span class="op">==</span> <span class="typ">Action</span>::<span class="val">"ReadArtifact"</span>,
+  <span class="kw">resource</span>  <span class="op">==</span> <span class="typ">ArtifactType</span>::<span class="val">"denial_tags"</span>
+);</div>
+  </div>
+
+  <div class="policy-card">
+    <div class="policy-header">
+      <span class="policy-id">P-005</span>
+      <span class="policy-title">Internal Tools — all tiers + condition</span>
+    </div>
+    <div class="cedar"><span class="cm">// Admin: restricted access, SSN stripped in app</span>
+<span class="kw">permit</span> (
+  <span class="kw">principal</span> <span class="op">==</span> <span class="typ">Service</span>::<span class="val">"internal-tools"</span>,
+  <span class="kw">action</span>    <span class="op">==</span> <span class="typ">Action</span>::<span class="val">"ReadArtifact"</span>,
+  <span class="kw">resource</span>  <span class="op">in</span> <span class="typ">ArtifactTier</span>::<span class="val">"restricted"</span>
+) <span class="kw">when</span> { context.<span class="val">callerUserId</span>.<span class="val">hasValue</span>() };</div>
+  </div>
+
+  <div class="policy-card">
+    <div class="policy-header">
+      <span class="policy-id">P-006</span>
+      <span class="policy-title">Default deny — closed world</span>
+    </div>
+    <div class="cedar"><span class="cm">// No explicit policy needed —</span>
+<span class="cm">// AVP defaults to DENY.</span>
+<span class="cm">//</span>
+<span class="cm">// Any new artifact type added to LAPS</span>
+<span class="cm">// is automatically inaccessible until</span>
+<span class="cm">// a permit policy is written for it.</span>
+</div>
+  </div>
+
+</div>
+
+</body>
+</html>

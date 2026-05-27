@@ -3,23 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Earnest Architecture Guardrails</title>
+  <title>Earnest Eng Journals</title>
   <style>
     :root {
       --bg: #f8fafc;
       --surface: #ffffff;
-      --surface2: #f1f5f9;
       --border: #e2e8f0;
-      --border-strong: #cbd5e1;
       --accent: #2563eb;
       --accent-soft: #eff6ff;
-      --green: #16a34a;
-      --amber: #d97706;
-      --red: #dc2626;
       --text: #0f172a;
       --text-soft: #334155;
       --muted: #64748b;
-      --sidebar-w: 260px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,952 +27,146 @@
       font-size: 16px;
       line-height: 1.7;
       -webkit-font-smoothing: antialiased;
-    }
-
-    code {
-      font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
-      font-size: .88em;
-      background: var(--surface2);
-      padding: 1px 6px;
-      border-radius: 4px;
-      color: #1e293b;
-    }
-
-    /* ── Layout ───────────────────────────────── */
-    .layout {
-      display: grid;
-      grid-template-columns: var(--sidebar-w) 1fr;
       min-height: 100vh;
     }
 
-    /* ── Sidebar ──────────────────────────────── */
-    aside.sidebar {
-      background: #ffffff;
-      border-right: 1px solid var(--border);
-      padding: 36px 28px;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow-y: auto;
-    }
-
-    .brand {
-      margin-bottom: 36px;
-      padding-bottom: 24px;
+    header {
+      background: var(--surface);
       border-bottom: 1px solid var(--border);
+      padding: 2rem 3rem;
     }
-    .brand .eyebrow {
-      font-size: 11px;
+
+    header h1 {
+      font-size: 1.6rem;
       font-weight: 700;
-      letter-spacing: .15em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: 8px;
-    }
-    .brand h1 {
-      font-size: 1.25rem;
-      font-weight: 800;
-      line-height: 1.25;
-      background: linear-gradient(135deg, #1e3a8a 30%, #7c3aed);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    nav.toc-side .toc-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: .15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 14px;
-    }
-    nav.toc-side ol { list-style: none; counter-reset: section; }
-    nav.toc-side a {
-      display: block;
-      color: var(--text-soft);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      padding: 9px 14px;
-      border-radius: 8px;
-      margin-bottom: 3px;
-      transition: all .15s;
-      border-left: 3px solid transparent;
-    }
-    nav.toc-side a:hover {
-      color: var(--accent);
-      background: var(--accent-soft);
-    }
-    nav.toc-side a.active {
-      color: var(--accent);
-      background: var(--accent-soft);
-      border-left-color: var(--accent);
-      font-weight: 600;
-    }
-    nav.toc-side .num {
-      display: inline-block;
-      width: 22px;
-      color: var(--muted);
-      font-weight: 600;
-      font-size: 13px;
-    }
-
-    /* ── Main column ──────────────────────────── */
-    main {
-      padding: 48px 64px 80px;
-      max-width: 980px;
-    }
-
-    @media (max-width: 1100px) {
-      .layout { grid-template-columns: 220px 1fr; }
-      main { padding: 40px 40px 60px; }
-    }
-    @media (max-width: 800px) {
-      .layout { grid-template-columns: 1fr; }
-      aside.sidebar { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
-      main { padding: 32px 24px 60px; }
-    }
-
-    /* ── Lead block ───────────────────────────── */
-    .lead-block {
-      margin-bottom: 56px;
-      padding-bottom: 32px;
-      border-bottom: 1px solid var(--border);
-    }
-    .lead-block h2 {
-      font-size: 2rem;
-      font-weight: 800;
-      line-height: 1.2;
-      margin-bottom: 14px;
       color: var(--text);
+      letter-spacing: -0.02em;
     }
-    .lead-block p {
-      font-size: 1.05rem;
+
+    header p {
+      margin-top: 0.4rem;
       color: var(--muted);
-      max-width: 700px;
-      line-height: 1.7;
+      font-size: 0.95rem;
     }
 
-    /* ── Sections ─────────────────────────────── */
-    .section { margin-bottom: 80px; scroll-margin-top: 24px; }
+    main {
+      max-width: 860px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+    }
 
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      margin-bottom: 24px;
-    }
-    .section-icon {
-      width: 52px; height: 52px; border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 26px; flex-shrink: 0;
-    }
-    .section-title h2 {
-      font-size: 1.7rem;
-      font-weight: 800;
-      letter-spacing: -.01em;
-    }
-    .section-title .sec-num {
-      font-size: 13px;
+    .section-label {
+      font-size: 0.7rem;
       font-weight: 700;
-      color: var(--accent);
-      letter-spacing: .12em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
-      display: block;
-      margin-bottom: 2px;
-    }
-    .section-lead {
-      font-size: 1.02rem;
       color: var(--muted);
-      max-width: 780px;
-      margin-bottom: 28px;
-      line-height: 1.7;
+      margin-bottom: 1.2rem;
     }
 
-    /* ── Cards ────────────────────────────────── */
-    .card-grid {
+    .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 18px;
-      margin-bottom: 24px;
+      gap: 1.25rem;
     }
 
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 24px 26px;
-      transition: box-shadow .2s, border-color .2s, transform .2s;
+      border-radius: 10px;
+      padding: 1.5rem 1.75rem;
+      text-decoration: none;
+      display: block;
+      transition: border-color 0.15s, box-shadow 0.15s;
     }
+
     .card:hover {
-      border-color: #93c5fd;
-      box-shadow: 0 6px 20px rgba(37,99,235,.08);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
     }
-    .card h3 {
-      font-size: 1.02rem;
-      font-weight: 700;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      color: var(--text);
-      letter-spacing: -.005em;
-    }
-    .card p {
-      font-size: .94rem;
-      color: var(--muted);
-      margin-bottom: 14px;
-      line-height: 1.65;
-    }
-    .card ul { list-style: none; }
-    .card ul li {
-      font-size: .92rem;
-      color: var(--text-soft);
-      padding: 7px 0;
-      border-bottom: 1px solid var(--surface2);
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      line-height: 1.6;
-    }
-    .card ul li:last-child { border-bottom: none; }
-    .card ul li::before {
-      content: '›';
+
+    .card-tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
       color: var(--accent);
-      font-weight: 700;
-      flex-shrink: 0;
+      background: var(--accent-soft);
+      border-radius: 4px;
+      padding: 2px 8px;
+      margin-bottom: 0.75rem;
+    }
+
+    .card h2 {
       font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.4rem;
       line-height: 1.4;
     }
-    .card ul li strong { color: var(--text); font-weight: 600; }
 
-    /* ── Callouts ─────────────────────────────── */
-    .callout {
-      border-radius: 12px;
-      padding: 22px 26px;
-      margin: 0 0 24px;
-      border-left: 4px solid;
-    }
-    .callout-insight  { background: var(--accent-soft); border-color: var(--accent); }
-    .callout-warn     { background: #fef2f2; border-color: var(--red); }
-    .callout-lesson   { background: #fffbeb; border-color: var(--amber); }
-    .callout .callout-label {
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-    .callout-insight .callout-label { color: var(--accent); }
-    .callout-warn    .callout-label { color: var(--red); }
-    .callout-lesson  .callout-label { color: var(--amber); }
-    .callout p {
-      font-size: .96rem;
-      color: var(--text);
-      line-height: 1.7;
-    }
-    .callout strong { color: var(--text); font-weight: 700; }
-
-    /* ── Flow ─────────────────────────────────── */
-    .flow {
-      display: flex;
-      align-items: stretch;
-      flex-wrap: wrap;
-      margin: 0 0 24px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 28px 28px;
-      row-gap: 18px;
-      column-gap: 0;
-    }
-    .flow-step {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 16px 20px;
-      text-align: center;
-      min-width: 160px;
-      flex: 1 1 160px;
-      max-width: 220px;
-    }
-    .flow-step .step-label {
-      font-size: .72rem;
+    .card p {
+      font-size: 0.875rem;
       color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .12em;
-      font-weight: 700;
+      line-height: 1.55;
     }
-    .flow-step .step-name {
-      font-weight: 700;
-      color: var(--text);
-      margin-top: 5px;
-      font-size: .98rem;
-      line-height: 1.35;
-    }
-    .flow-step .step-desc {
-      font-size: .8rem;
-      color: var(--muted);
-      margin-top: 6px;
-      line-height: 1.5;
-    }
-    .flow-arrow {
-      color: var(--accent);
-      font-size: 1.4rem;
-      padding: 0 12px;
-      display: flex;
-      align-items: center;
-      flex-shrink: 0;
-      font-weight: 600;
-    }
-    .flow-arrow:last-child { display: none; }
-
-    /* ── Table ────────────────────────────────── */
-    .compare-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: .92rem;
-      background: var(--surface);
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-    .compare-table th {
-      background: var(--surface2);
-      padding: 11px 16px;
-      text-align: left;
-      font-size: .78rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--muted);
-      border-bottom: 1px solid var(--border);
-    }
-    .compare-table td {
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--surface2);
-      color: var(--text-soft);
-    }
-    .compare-table tr:last-child td { border-bottom: none; }
-
-    /* ── Banner (agentic) ─────────────────────── */
-    .agentic-banner {
-      background: linear-gradient(135deg, var(--accent-soft), #f5f3ff);
-      border: 1px solid #c7d2fe;
-      border-radius: 16px;
-      padding: 30px 32px;
-      margin-bottom: 24px;
-    }
-    .agentic-banner h3 {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #3730a3;
-      margin-bottom: 9px;
-    }
-    .agentic-banner p {
-      color: var(--text-soft);
-      font-size: .95rem;
-      line-height: 1.75;
-    }
-
-    /* ── Icon backgrounds ─────────────────────── */
-    .icon-blue   { background: #dbeafe; }
-    .icon-purple { background: #ede9fe; }
-    .icon-green  { background: #dcfce7; }
-    .icon-amber  { background: #fef3c7; }
-    .icon-teal   { background: #ccfbf1; }
-    .icon-indigo { background: #e0e7ff; }
 
     footer {
-      margin-top: 60px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 3rem 2rem;
+      font-size: 0.8rem;
       color: var(--muted);
-      font-size: .85rem;
+      border-top: 1px solid var(--border);
+      margin-top: 4rem;
     }
   </style>
 </head>
 <body>
 
-<div class="layout">
+<header>
+  <h1>Earnest Eng Journals</h1>
+  <p>Proposals, architecture docs, and living design documents from the Earnest engineering team.</p>
+</header>
 
-  <!-- ── Sidebar ── -->
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="eyebrow">Earnest Engineering</div>
-      <h1>Architecture Guardrails</h1>
-    </div>
-    <nav class="toc-side">
-      <div class="toc-label">Contents</div>
-      <ol>
-        <li><a href="#craftsmanship"><span class="num">01</span>Code Craftsmanship</a></li>
-        <li><a href="#simplicity"><span class="num">02</span>Simplicity</a></li>
-        <li><a href="#tdd"><span class="num">03</span>TDD &amp; Shift Left</a></li>
-        <li><a href="#integrations"><span class="num">04</span>Integrations</a></li>
-        <li><a href="#database"><span class="num">05</span>Database</a></li>
-        <li><a href="#observability"><span class="num">06</span>Observability</a></li>
-        <li><a href="#agentic"><span class="num">07</span>AI-Augmented Dev</a></li>
-      </ol>
-    </nav>
-  </aside>
+<main>
+  <p class="section-label">All documents</p>
+  <div class="grid">
 
-  <!-- ── Main ── -->
-  <main>
-
-    <div class="lead-block">
+    <a class="card" href="architecture-guardrails/">
+      <span class="card-tag">Guardrails</span>
       <h2>Architecture Guardrails</h2>
-      <p>
-        Opinionated, battle-tested guardrails for building high-quality systems —
-        grounded in real industry lessons, not surface-level advice. From code craftsmanship
-        through AI-augmented workflows.
-      </p>
-    </div>
+      <p>Opinionated engineering guardrails for building high-quality systems — naming, testing, observability, integrations, and more.</p>
+    </a>
 
-    <!-- ════════════════════════════════════════════
-         1. CRAFTSMANSHIP
-    ═══════════════════════════════════════════════ -->
-    <section class="section" id="craftsmanship">
-      <div class="section-header">
-        <div class="section-icon icon-blue">🛠</div>
-        <div class="section-title">
-          <span class="sec-num">Section 01</span>
-          <h2>Code Craftsmanship &amp; Developer Pride</h2>
-        </div>
-      </div>
-      <p class="section-lead">
-        Code is written once and read hundreds of times. Optimise relentlessly for the reader, not the writer.
-      </p>
+    <a class="card" href="infra-ai-improvements/">
+      <span class="card-tag">Proposal</span>
+      <h2>Infra AI Improvements</h2>
+      <p>Automating infrastructure provisioning workflows using AI-assisted tooling and GitHub Actions.</p>
+    </a>
 
-      <div class="callout callout-insight">
-        <div class="callout-label">Core Insight</div>
-        <p>Ward Cunningham described technical debt as <strong>the difference between the understanding you have now and the understanding embedded in the code</strong>. It accumulates every time the code fails to reflect current domain knowledge — and like financial debt, it compounds. The interest is paid in every sprint: slower delivery, higher defect rate, harder onboarding.</p>
-      </div>
+    <a class="card" href="earnest-agents/">
+      <span class="card-tag">Architecture</span>
+      <h2>Earnest Agents</h2>
+      <p>Architecture and design for the auto-engineering agent system — how it works, what it owns, and how it integrates.</p>
+    </a>
 
-      <div class="card-grid">
-        <div class="card">
-          <h3>📐 Design for the Consumer</h3>
-          <p>Before writing a function or module, ask: how should a caller use this? A clean interface makes the right thing easy and the wrong thing hard. Every public method is a contract — design it from the outside in, not the inside out.</p>
-          <ul>
-            <li>Write the call site first — if usage feels awkward, the design is wrong</li>
-            <li>Expose the minimum necessary; default everything to private. Shrinking public surface is often more valuable than adding features</li>
-            <li>A function that does one thing at one level of abstraction is always easier to use, test, and replace</li>
-          </ul>
-        </div>
+    <a class="card" href="avp-laps-poc/">
+      <span class="card-tag">POC</span>
+      <h2>AVP + LAPS POC</h2>
+      <p>Architecture diagram for the LAPS and AVP proof-of-concept integration.</p>
+    </a>
 
-        <div class="card">
-          <h3>🪟 The Broken Window Effect</h3>
-          <p>One hack, one dead code block, one misleading name signals that nobody cares. Teams lower their standards to match the existing bar, and discipline collapses quickly once the first exception is made.</p>
-          <ul>
-            <li>Boy Scout Rule: leave code better than you found it — even one renamed variable counts</li>
-            <li>Tech debt discovered during feature work must be filed, tracked, and paid down</li>
-            <li>Never commit code you'd be embarrassed to defend in a post-mortem</li>
-          </ul>
-        </div>
+    <a class="card" href="sdlc-improvements/">
+      <span class="card-tag">DX</span>
+      <h2>SDLC Improvements</h2>
+      <p>Developer experience snapshot — prioritized SDLC improvement tasks from the DX initiative.</p>
+    </a>
 
-        <div class="card">
-          <h3>✅ Code Review Culture</h3>
-          <p>Reviews are the highest-leverage quality practice — but only when genuinely about correctness and clarity, not gatekeeping. The reviewer learns as much as the author.</p>
-          <ul>
-            <li>Ask: will a stranger understand this in six months? Are errors handled or silently swallowed?</li>
-            <li>Style wars belong in linter config, not review comments</li>
-            <li>Rotate reviewers deliberately to avoid knowledge silos</li>
-            <li>When the same issue surfaces repeatedly in reviews, convert it to a guardrail</li>
-          </ul>
-        </div>
+  </div>
+</main>
 
-        <div class="card">
-          <h3>🎯 Names Reveal Intent</h3>
-          <p>If you need a comment to explain a variable, the variable is misnamed. Names should make code read as a sentence about the problem domain.</p>
-          <ul>
-            <li>Use the domain's vocabulary — align with product and business language</li>
-            <li>Command-Query Separation: a function either changes state or returns data, never both</li>
-            <li>Rename aggressively when understanding evolves — stale names are debt</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- ════════════════════════════════════════════
-         2. SIMPLICITY
-    ═══════════════════════════════════════════════ -->
-    <section class="section" id="simplicity">
-      <div class="section-header">
-        <div class="section-icon icon-teal">✂️</div>
-        <div class="section-title">
-          <span class="sec-num">Section 02</span>
-          <h2>Simplicity &amp; Avoiding Over-Engineering</h2>
-        </div>
-      </div>
-      <p class="section-lead">
-        Complexity is the root cause of most software failures. It is never free, always compounds, and is much easier to add than to remove.
-      </p>
-
-      <div class="callout callout-insight">
-        <div class="callout-label">Core Insight</div>
-        <p>Rich Hickey's distinction: <strong>simple</strong> means one responsibility, low cognitive load. <strong>Easy</strong> means familiar. We routinely choose easy over simple — ORMs, frameworks, clever abstractions — because it feels productive. Easy-now compounds into hard-later. The real cost of a complex system isn't building it; it's every future engineer who must hold it in their head.</p>
-      </div>
-
-      <div class="card-grid">
-        <div class="card">
-          <h3>💸 Complexity Is Debt With Interest</h3>
-          <p>Every layer, pattern, or service added speculatively is a bet on a future that often doesn't arrive. The carrying cost is paid in every sprint — slower onboarding, harder debugging, more things to break.</p>
-          <ul>
-            <li>Accidental complexity is always avoidable; essential complexity should be isolated, not spread</li>
-            <li>Every new abstraction needs a business case: what problem does this solve right now?</li>
-            <li>Measure complexity by onboarding time — a new engineer productive in a day is the target</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>🏗 Start Simple, Split Deliberately</h3>
-          <p>The distributed monolith is the most damaging pattern: all the operational cost of distributed systems with none of the independence. Start with a modular monolith; extract components only when you have a specific, demonstrated need.</p>
-          <ul>
-            <li>Valid reasons to split: independent scaling, independent deployability, compliance boundary</li>
-            <li>Invalid reasons: "the code looks big," "that's what modern systems do"</li>
-            <li>Conway's Law is real — your architecture mirrors your team structure whether you plan for it or not</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>🚫 Premature Abstraction &amp; YAGNI</h3>
-          <p>DRY is about knowledge duplication, not text duplication. Two functions that look similar but represent different concepts should not be merged — they will diverge, and you'll pay for the artificial coupling.</p>
-          <ul>
-            <li>Rule of Three: wait for the third instance before abstracting</li>
-            <li>Sandi Metz: duplication is far cheaper than the wrong abstraction</li>
-            <li>YAGNI applies to infrastructure too — don't provision for 10× load you don't have</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>📉 Simplicity Health Check</h3>
-          <p>A few quick signals on whether your system has stayed grounded or started accumulating complexity for its own sake.</p>
-          <table class="compare-table">
-            <tr><th>Healthy</th><th>Warning Sign</th></tr>
-            <tr><td>New engineer productive in 1 day</td><td>Weeks to understand the codebase</td></tr>
-            <tr><td>Deployments are boring</td><td>Deployments require ceremonies</td></tr>
-            <tr><td>Feature spans 1–2 components</td><td>Feature spans 5+ teams</td></tr>
-            <tr><td>Rollback is one command</td><td>Rollback requires coordination</td></tr>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- ════════════════════════════════════════════
-         3. TDD & SHIFT LEFT
-    ═══════════════════════════════════════════════ -->
-    <section class="section" id="tdd">
-      <div class="section-header">
-        <div class="section-icon icon-green">🧪</div>
-        <div class="section-title">
-          <span class="sec-num">Section 03</span>
-          <h2>TDD &amp; Shift-Left Quality</h2>
-        </div>
-      </div>
-      <p class="section-lead">
-        Testing is not a phase — it is a design practice. Untestable code is always poorly designed code.
-      </p>
-
-      <div class="callout callout-insight">
-        <div class="callout-label">Core Insight</div>
-        <p>Kent Beck's real insight was not "write tests before code" — it was: <strong>if you write a test first, you are forced to use your own API before it exists, and bad APIs reveal themselves immediately</strong>. TDD is a design feedback loop. NIST data shows defects cost 1× to fix in development and 100× in production. Shift-left is basic economics, not a philosophy.</p>
-      </div>
-
-      <div class="flow">
-        <div class="flow-step">
-          <div class="step-label">Red</div>
-          <div class="step-name">Write failing test</div>
-          <div class="step-desc">Define behavior from outside</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <div class="step-label">Green</div>
-          <div class="step-name">Minimal passing code</div>
-          <div class="step-desc">Make it pass, not beautiful</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <div class="step-label">Refactor</div>
-          <div class="step-name">Clean under green</div>
-          <div class="step-desc">Improve design, not behavior</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <div class="step-label">Gates</div>
-          <div class="step-name">CI enforces quality</div>
-          <div class="step-desc">Tests, coverage, SAST</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <div class="step-label">Deploy</div>
-          <div class="step-name">Confidence to ship</div>
-          <div class="step-desc">Boring, routine, fast</div>
-        </div>
-      </div>
-
-      <div class="card-grid">
-        <div class="card">
-          <h3>🔺 Testing Pyramid</h3>
-          <p>Each layer plays a different role. Get the ratios right and you have a fast, trustworthy suite. Get them wrong and you have either slow CI or false confidence.</p>
-          <ul>
-            <li><strong>Unit:</strong> test behavior, not implementation; Arrange-Act-Assert always</li>
-            <li><strong>Integration:</strong> use a real database in a container — mocking the DB is a reliable way to ship bugs</li>
-            <li><strong>E2E:</strong> critical user paths only; flaky tests are bugs, not inconveniences to skip</li>
-            <li><strong>Contract:</strong> consumers publish expectations, providers verify them on every build</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>🧬 Beyond Coverage</h3>
-          <p>Coverage measures which lines ran — not whether tests catch bugs. A suite with 90% coverage and 60% mutation score is telling you the coverage was gamed.</p>
-          <ul>
-            <li><strong>Mutation testing</strong> introduces small bugs and verifies tests fail — surviving mutants reveal exactly what's unverified</li>
-            <li><strong>Property-based testing</strong> generates thousands of inputs, finding bugs months of manual testing miss</li>
-            <li><strong>Fitness functions</strong> enforce architecture constraints in CI — dependency direction, performance budgets, security policies</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>⬅️ Shift Left Gates</h3>
-          <p>Catch problems where they're cheapest to fix. Each gate in the pipeline narrows the surface of issues that can reach production.</p>
-          <ul>
-            <li><strong>Pre-commit:</strong> formatting (automated, never debated), static analysis, secret scanning</li>
-            <li><strong>Pull request:</strong> full test suite, coverage as a hard fail, SAST, dependency CVE scan</li>
-            <li><strong>Deploy:</strong> canary with automated SLO-based rollback, smoke tests before traffic routing</li>
-            <li>Flaky tests are bugs — fix or delete them, never retry</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- ════════════════════════════════════════════
-         4. INTEGRATIONS
-    ═══════════════════════════════════════════════ -->
-    <section class="section" id="integrations">
-      <div class="section-header">
-        <div class="section-icon icon-amber">🔌</div>
-        <div class="section-title">
-          <span class="sec-num">Section 04</span>
-          <h2>Third-Party Integration Patterns</h2>
-        </div>
-      </div>
-      <p class="section-lead">
-        Every external dependency is a risk you didn't design, a failure mode you don't control, and a security surface you must actively protect.
-      </p>
-
-      <div class="callout callout-warn">
-        <div class="callout-label">Fallacies of Distributed Computing</div>
-        <p>Peter Deutsch: the network is reliable; latency is zero; bandwidth is infinite; the network is secure; topology doesn't change. <strong>Every integration is built on these false assumptions.</strong> Design for their failure from day one — not after the first production incident teaches you to.</p>
-      </div>
-
-      <div class="card-grid">
-        <div class="card">
-          <h3>⚡ Resilience Patterns</h3>
-          <p>A single slow dependency without protection will exhaust your thread pool and cascade failures through your entire system. Resilience is not a feature — it's the minimum viable defense.</p>
-          <ul>
-            <li><strong>Circuit breaker:</strong> open on failure threshold, fail fast, half-open probe to recover. Tune per integration</li>
-            <li><strong>Retry with backoff and jitter:</strong> 1s, 2s, 4s — not 1s, 1s, 1s. Only retry idempotent operations</li>
-            <li><strong>Timeouts on everything:</strong> connection and read timeouts, set separately. Always shorter than your own SLA</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>🧱 Anti-Corruption Layer</h3>
-          <p>Prevent the external system's concepts, naming, and structure from bleeding into your core business logic. When a vendor changes their API, only the ACL changes.</p>
-          <ul>
-            <li>One dedicated module owns all communication with the third party — the rest of the system stays vendor-agnostic</li>
-            <li>Translate external types to internal domain types at the boundary; never use vendor DTOs in business logic</li>
-            <li>Swapping vendors should touch only the ACL — that is the test of a well-formed boundary</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>🔐 Secrets &amp; Credentials</h3>
-          <p>Credentials are the most valuable thing in your system. Treat them like cash, not configuration.</p>
-          <ul>
-            <li>API keys never in code or committed env vars — use a secrets manager like Vault or AWS Secrets Manager</li>
-            <li>Least-privilege: each component has only the scopes it actually uses</li>
-            <li>Automated rotation, tested under load — if you can't rotate without downtime, you can't rotate under pressure</li>
-            <li>Audit-log every secret access; anomaly patterns catch compromises early</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>📬 Webhooks &amp; API Versioning</h3>
-          <p>Webhooks look simple but have subtle failure modes. Version drift across vendors is a slow leak that becomes an outage when their old version is finally removed.</p>
-          <ul>
-            <li>Return 2xx immediately and process asynchronously — never block a webhook with long work</li>
-            <li>Idempotency is mandatory: the same event delivered twice must produce the same result</li>
-            <li>Verify HMAC signatures — never trust an incoming webhook without validation</li>
-            <li>Track which vendor API version each component consumes; upgrade proactively, not reactively</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- ════════════════════════════════════════════
-         5. DATABASE
-    ═══════════════════════════════════════════════ -->
-    <section class="section" id="database">
-      <div class="section-header">
-        <div class="section-icon icon-purple">🗄</div>
-        <div class="section-title">
-          <span class="sec-num">Section 05</span>
-          <h2>Database Performance Patterns</h2>
-        </div>
-      </div>
-      <p class="section-lead">
-        The database is almost always the bottleneck and the hardest part of a system to change once live. Treat every query, schema decision, and migration as a long-term commitment.
-      </p>
-
-      <div class="callout callout-lesson">
-        <div class="callout-label">Industry Lesson</div>
-        <p>The most common cause of production performance incidents is not hardware — it is <strong>queries that worked fine at 10k rows and catastrophically at 10M</strong>. A missing index turns O(log n) into O(n). Every new query and schema change must be reviewed as if the table already has 100× its current row count.</p>
-      </div>
-
-      <div class="card-grid">
-        <div class="card">
-          <h3>⚡ Query Discipline</h3>
-          <p>Most performance incidents are not infrastructure problems — they're query problems that became visible only at scale. Catch them at review time.</p>
-          <ul>
-            <li>Run <code>EXPLAIN ANALYZE</code> on every new query before merge — sequential scan on a large table is a merge blocker</li>
-            <li>Covering indexes include all columns the query needs so it never touches the table</li>
-            <li>Partial indexes target only the rows queries actually filter on</li>
-            <li>N+1 is a bug — never query inside a loop; use eager loading, batching, or DataLoader</li>
-            <li>Paginate everything variable-length with keyset (cursor) pagination, not offset</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>🔄 Safe Schema Migrations</h3>
-          <p>Adding a non-null column to a 200M-row table can take an exclusive lock for the full backfill. This pattern has caused 45-minute outages at companies without migration discipline.</p>
-          <ul>
-            <li><strong>Expand/Contract:</strong> add nullable column, backfill in batches, switch reads, drop old column. Never skip phases</li>
-            <li>Use online tools for large tables — gh-ost for MySQL, pg_repack for Postgres</li>
-            <li>Test migrations on a production-sized dataset before running in production</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>🔒 Transactions &amp; Connections</h3>
-          <p>Long-running transactions and unbounded connections turn small traffic spikes into full database outages. Both are easy to prevent and almost impossible to recover from under load.</p>
-          <ul>
-            <li>Keep transactions short — do all preparation outside the transaction</li>
-            <li>Never wait for external I/O (HTTP calls, file reads) inside a transaction</li>
-            <li>Alert on transactions open longer than 30 seconds — almost always a bug</li>
-            <li>Use a server-side connection pool like PgBouncer; size application pools deliberately</li>
-            <li>Route reporting and analytics to read replicas — protect the primary write path</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- ════════════════════════════════════════════
-         6. OBSERVABILITY
-    ═══════════════════════════════════════════════ -->
-    <section class="section" id="observability">
-      <div class="section-header">
-        <div class="section-icon icon-teal">📡</div>
-        <div class="section-title">
-          <span class="sec-num">Section 06</span>
-          <h2>Observability &amp; Monitoring</h2>
-        </div>
-      </div>
-      <p class="section-lead">
-        Monitoring tells you whether a known condition occurred. Observability lets you answer questions you didn't know to ask when you built the system.
-      </p>
-
-      <div class="callout callout-insight">
-        <div class="callout-label">Core Distinction</div>
-        <p>Charity Majors: <strong>monitoring is for known unknowns — you define the condition and wait. Observability is for unknown unknowns — something fails in a way you didn't anticipate, and you can still interrogate the system's state.</strong> Most production systems are monitored but not observable. The gap is where incidents live for hours.</p>
-      </div>
-
-      <div class="card-grid">
-        <div class="card">
-          <h3>📝 Structured Logging</h3>
-          <p>Logs are the narrative of what your system did. Structured logs make that narrative searchable and queryable instead of a wall of text.</p>
-          <ul>
-            <li>JSON only — every log line is a structured object, never a concatenated string</li>
-            <li>Mandatory fields: timestamp (ISO 8601), service name, level, correlation/trace ID</li>
-            <li>Propagate correlation ID through every hop: HTTP, async messages, background jobs</li>
-            <li>Never log PII or credentials. Log at decision boundaries, not every line</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>📈 Metrics &amp; Four Golden Signals</h3>
-          <p>Google SRE's four signals are the minimum viable metric set for any production system. Everything else is supplemental.</p>
-          <ul>
-            <li><strong>Latency:</strong> p50, p95, p99 separately — averages always lie</li>
-            <li><strong>Traffic:</strong> requests/sec, messages/sec — the demand baseline</li>
-            <li><strong>Errors:</strong> rate of failures; distinguish 4xx (client) from 5xx (server)</li>
-            <li><strong>Saturation:</strong> CPU, memory, connection pool, queue depth</li>
-            <li>Pair technical metrics with business metrics; revenue/min correlates with system health</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>🔍 Distributed Tracing</h3>
-          <p>A trace tells the complete story of a request as it travels through your system. Without it, debugging a slow request is archaeology; with it, navigation.</p>
-          <ul>
-            <li>OpenTelemetry as the standard — vendor-neutral, portable across backends</li>
-            <li>Auto-instrument HTTP clients, DB drivers, queue consumers</li>
-            <li>100% sampling for errors; 1–10% for healthy traffic</li>
-            <li>Trace IDs in error responses — support hands off the full debug path instantly</li>
-            <li>Add business context to spans: user ID, order ID, feature flag state</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>🔔 Alerting &amp; Post-Mortems</h3>
-          <p>Alert fatigue is an engineering failure. Every alert that fires without action trains engineers to ignore alerts — including the one that matters.</p>
-          <ul>
-            <li>Alert on symptoms, not causes: "error rate elevated," not "CPU at 70%"</li>
-            <li>Every alert has a runbook link — no undocumented alert ever merges</li>
-            <li>An alert that fires twice a week without an incident is noise; fix or delete it</li>
-            <li>Post-mortems: blameless, 5 Whys to systemic root cause, time-bound action items, shared across teams</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="callout callout-insight">
-        <div class="callout-label">SLO / SLI / SLA</div>
-        <p><strong>SLI</strong> is the measurement. <strong>SLO</strong> is the target — "99.5% of requests under 200ms." <strong>SLA</strong> is the contract with consequences. Set SLOs before launch, not after the first incident. Error budgets are what's left over: if the budget is exhausted, stop new features and fix reliability. Don't set 99.99% because it sounds impressive — set the minimum acceptable level.</p>
-      </div>
-    </section>
-
-    <!-- ════════════════════════════════════════════
-         7. AGENTIC
-    ═══════════════════════════════════════════════ -->
-    <section class="section" id="agentic">
-      <div class="section-header">
-        <div class="section-icon icon-indigo">🤖</div>
-        <div class="section-title">
-          <span class="sec-num">Section 07</span>
-          <h2>AI-Augmented &amp; Agentic Development</h2>
-        </div>
-      </div>
-      <p class="section-lead">
-        AI agents are a force multiplier, not a replacement for engineering judgment. Every guardrail in this document becomes more important — not less — when agents are generating code at machine speed.
-      </p>
-
-      <div class="agentic-banner">
-        <h3>The Fundamental Shift</h3>
-        <p>
-          The real shift is that <strong>engineers move from primary authors to system designers, context providers, and judgment appliers</strong>.
-          The leverage moves from typing speed to clarity of thinking, quality of constraints, and depth of domain knowledge.
-          An engineer who can articulate precise requirements, design good interfaces, and identify subtle errors in generated code
-          is dramatically more productive with AI than one who cannot. <strong>Good engineering fundamentals matter more, not less.</strong>
-        </p>
-      </div>
-
-      <div class="flow">
-        <div class="flow-step">
-          <div class="step-label">Human</div>
-          <div class="step-name">Define requirements</div>
-          <div class="step-desc">Clear acceptance criteria</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <div class="step-label">Human + Agent</div>
-          <div class="step-name">Tests first</div>
-          <div class="step-desc">Tests are the spec</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <div class="step-label">Agent</div>
-          <div class="step-name">Implement</div>
-          <div class="step-desc">Satisfy the tests</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <div class="step-label">CI</div>
-          <div class="step-name">Quality gates</div>
-          <div class="step-desc">Tests, coverage, SAST</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <div class="step-label">Human</div>
-          <div class="step-name">Deep review</div>
-          <div class="step-desc">Correctness, security, fit</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-step">
-          <div class="step-label">Human</div>
-          <div class="step-name">Approve &amp; merge</div>
-          <div class="step-desc">Named owner, full accountability</div>
-        </div>
-      </div>
-
-      <div class="card-grid">
-        <div class="card">
-          <h3>📝 Context Is the Primary Input</h3>
-          <p>An agent's output quality is bounded by the quality of context it receives. Vague instructions produce generic, often wrong code; precise context produces work that fits the codebase.</p>
-          <ul>
-            <li>Agent context files are the most important documentation you'll write — domain glossary, architecture decisions, patterns to follow and avoid</li>
-            <li>Treat them as code: versioned, reviewed, kept current. Stale context produces stale output</li>
-            <li>Scope context to the task — a focused brief beats dumping the entire system design</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>🎯 TDD as the AI Harness</h3>
-          <p>TDD is the most effective constraint for AI-generated code. The test suite becomes the specification the agent must satisfy, not guess at.</p>
-          <ul>
-            <li>Write or approve tests before asking the agent to implement</li>
-            <li>AI agents will write tests that pass by doing the wrong thing — mutation testing catches this</li>
-            <li>Vibe-checking that generated code looks right is not a substitute for a test suite</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>👁 Reviewing AI Output</h3>
-          <p>AI code looks confident and well-formatted regardless of correctness. The clean appearance removes the visual cues that normally trigger careful reading.</p>
-          <ul>
-            <li>Review AI PRs at least as critically as a junior engineer's — more carefully for security-sensitive code</li>
-            <li>Watch for plausible-but-wrong logic, insecure defaults, invented conventions, unnecessary abstraction</li>
-            <li>Never approve AI-generated infrastructure, migration, or security code without deep review</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>🔒 Accountability &amp; Safety</h3>
-          <p>The fact that code was generated by an AI does not change who is responsible for it. The engineer who approved the PR owns the outcome.</p>
-          <ul>
-            <li>"The AI wrote it" is not an explanation in a post-mortem</li>
-            <li>Agents operate on branches, never directly on main. Auto-merge from AI is a red line</li>
-            <li>AI models reproduce vulnerabilities from training data — SAST on every AI PR, always</li>
-            <li>Prompt injection: agents that process untrusted input can be manipulated via that input</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <footer>
-      Earnest Architecture Guardrails &nbsp;·&nbsp; Living document — update as patterns emerge &nbsp;·&nbsp; v0.4
-    </footer>
-
-  </main>
-
-</div>
-
-<script>
-  // Highlight active section in sidebar nav while scrolling
-  const sections = document.querySelectorAll('.section');
-  const navLinks = document.querySelectorAll('nav.toc-side a');
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const id = entry.target.id;
-        navLinks.forEach(link => {
-          link.classList.toggle('active', link.getAttribute('href') === '#' + id);
-        });
-      }
-    });
-  }, { rootMargin: '-30% 0px -60% 0px' });
-
-  sections.forEach(s => observer.observe(s));
-</script>
+<footer>Earnest Engineering &mdash; v0.1</footer>
 
 </body>
 </html>

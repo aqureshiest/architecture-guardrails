@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auto-Eng · Architecture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      color: #111;
+      padding: 64px 48px;
+      max-width: 860px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ── Typography ── */
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #111;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .lead {
+      font-size: 15px;
+      color: #555;
+      max-width: 640px;
+      line-height: 1.75;
+      margin-bottom: 48px;
+    }
+
+    h2 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 24px;
+      margin-top: 56px;
+    }
+
+    h2:first-of-type { margin-top: 0; }
+
+    h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 6px;
+    }
+
+    p {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.75;
+    }
+
+    /* ── Divider ── */
+    hr {
+      border: none;
+      border-top: 1px solid #e5e7eb;
+      margin: 48px 0;
+    }
+
+    /* ── Diagram ── */
+    .diagram {
+      background: #fafafa;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 32px 28px;
+    }
+
+    .layer {
+      background: #fff;
+      border: 1.5px solid #d1d5db;
+      border-radius: 8px;
+      padding: 14px 16px 16px;
+    }
+
+    .layer-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 10px;
+    }
+
+    .cards {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      background: #fff;
+      border: 1.5px solid #d1d5db;
+      border-radius: 6px;
+      padding: 10px 12px;
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .card.primary {
+      border-color: #374151;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 2px;
+    }
+
+    .card-sub {
+      font-size: 11px;
+      color: #9ca3af;
+      line-height: 1.5;
+    }
+
+    .card-sec {
+      font-size: 11px;
+      color: #059669;
+      font-weight: 500;
+      margin-top: 4px;
+    }
+
+    .strip {
+      margin-top: 8px;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 5px;
+      padding: 5px 10px;
+      font-size: 11px;
+      color: #15803d;
+      text-align: center;
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
+    .section-sub {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 6px;
+      margin-top: 10px;
+    }
+
+    .section-sub:first-child { margin-top: 0; }
+
+    .divider-dashed {
+      border: none;
+      border-top: 1px dashed #e5e7eb;
+      margin: 10px 0;
+    }
+
+    .base-strip {
+      margin-top: 10px;
+      border: 1px dashed #d1d5db;
+      border-radius: 5px;
+      padding: 6px 12px;
+      font-size: 11px;
+      color: #9ca3af;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 500;
+      background: #f3f4f6;
+      color: #6b7280;
+      border: 1px solid #d1d5db;
+      border-radius: 3px;
+      padding: 0 4px;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+
+    /* Arrow */
+    .arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 8px 0;
+    }
+
+    .arrow-label {
+      font-size: 10px;
+      color: #9ca3af;
+      margin-top: 2px;
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Principles ── */
+    .principles {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .principle {
+      border-left: 2px solid #e5e7eb;
+      padding-left: 16px;
+    }
+
+    .principle h3 {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .principle p {
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    /* ── Capabilities ── */
+    .cap-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .cap {
+      padding: 14px 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+    }
+
+    .cap h3 {
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .cap p {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    /* ── Roadmap ── */
+    .roadmap {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 0;
+    }
+
+    .roadmap-item {
+      padding: 0 20px 0 0;
+      border-right: 1px solid #e5e7eb;
+    }
+
+    .roadmap-item:last-child {
+      border-right: none;
+      padding-right: 0;
+      padding-left: 20px;
+    }
+
+    .roadmap-item:not(:first-child):not(:last-child) {
+      padding-left: 20px;
+    }
+
+    .roadmap-horizon {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 8px;
+    }
+
+    .roadmap-item h3 { font-size: 14px; margin-bottom: 6px; }
+    .roadmap-item p { font-size: 13px; color: #6b7280; }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 64px;
+      padding-top: 24px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 12px;
+      color: #9ca3af;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="eyebrow">Earnest Engineering · Internal</div>
+  <h1>Earnest Agents</h1>
+  <p class="lead">
+    Earnest Agents is foundational agentic infrastructure — a platform on which any AI-driven workflow can be built, deployed, and operated at Earnest. It handles multiple agent runtimes, integrates with Slack, GitHub, and our internal observability stack, and supports both on-demand tasks and recurring scheduled operations. This document describes the architecture and the design principles behind it.
+  </p>
+
+  <hr />
+
+  <!-- Architecture Diagram -->
+  <h2>Architecture</h2>
+
+  <div class="diagram">
+
+    <!-- Layer 1: Channels -->
+    <div class="layer">
+      <div class="layer-label">Inbound Channels</div>
+      <div class="grid-4">
+        <div class="card primary">
+          <div class="card-title">💬 Slack</div>
+          <div class="card-sub">Messages · slash commands · thread conversations</div>
+          <div class="card-sec">🔒 Verified</div>
+        </div>
+        <div class="card primary">
+          <div class="card-title">🌐 Web</div>
+          <div class="card-sub">Chat UI · real-time streaming · dashboards</div>
+          <div class="card-sec">🔒 Okta SSO</div>
+
+        </div>
+        <div class="card primary">
+          <div class="card-title">🔀 GitHub</div>
+          <div class="card-sub">PR webhooks · automated code review</div>
+          <div class="card-sec">🔒 Verified</div>
+        </div>
+        <div class="card primary">
+          <div class="card-title">🕐 Scheduled Tasks</div>
+          <div class="card-sub">Recurring tasks on a schedule · timezone-aware</div>
+          <div class="card-sec">🔒 Server-initiated</div>
+        </div>
+      </div>
+      <div class="strip">All access is authenticated and scoped — users can only act on their own data</div>
+    </div>
+
+    <div class="arrow">
+      <svg width="32" height="30" viewBox="0 0 32 30">
+        <line x1="16" y1="0" x2="16" y2="20" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="3,2.5"/>
+        <polyline points="10,17 16,28 22,17" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linejoin="round"/>
+      </svg>
+      <div class="arrow-label">task enqueued</div>
+    </div>
+
+    <!-- Layer 2: Queue -->
+    <div class="layer">
+      <div class="layer-label">Unified Queue</div>
+      <div class="card" style="text-align:center; padding: 12px 16px;">
+        <div class="card-title">One worker per conversation — ordered, no conflicts</div>
+        <div class="card-sub" style="margin-top:4px;">Follow-up messages are coalesced or injected mid-run · interactions stay fluid</div>
+      </div>
+    </div>
+
+    <div class="arrow">
+      <svg width="32" height="30" viewBox="0 0 32 30">
+        <line x1="16" y1="0" x2="16" y2="20" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="3,2.5"/>
+        <polyline points="10,17 16,28 22,17" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linejoin="round"/>
+      </svg>
+      <div class="arrow-label">turn dequeued</div>
+    </div>
+
+    <!-- Layer 3: Agent -->
+    <div class="layer">
+      <div class="layer-label">Agent Configuration</div>
+      <div class="cards">
+        <div class="card">
+          <div class="card-title">Identity</div>
+          <div class="card-sub">Each agent has a name, persona, and scope — deployable as a general assistant or a specialist</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Channel Access</div>
+          <div class="card-sub">Each agent is explicitly enabled for the channels it should respond to</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Capabilities</div>
+          <div class="card-sub">Tool access, available skills, and secrets are scoped per agent</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">
+      <svg width="32" height="30" viewBox="0 0 32 30">
+        <line x1="16" y1="0" x2="16" y2="20" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="3,2.5"/>
+        <polyline points="10,17 16,28 22,17" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linejoin="round"/>
+      </svg>
+      <div class="arrow-label">agent loaded</div>
+    </div>
+
+    <!-- Layer 4: Orchestrator -->
+    <div class="layer">
+      <div class="layer-label">Orchestrator · Claude (AWS Bedrock)</div>
+      <div class="cards" style="flex-wrap: nowrap; align-items: stretch;">
+        <div class="card primary" style="flex: 1;">
+          <div class="card-title">🧠 Reasoning</div>
+          <div class="card-sub">Iterates until the task is done — decides what to do, calls tools, inspects results</div>
+        </div>
+        <div class="card" style="flex: 2;">
+          <div class="card-title">🔧 What it can do</div>
+          <div class="card-sub" style="display:flex; flex-wrap:wrap; gap:3px 14px; font-size:12px; color:#6b7280;">
+            <span>Run code in a sandbox</span>
+            <span>Query production metrics</span>
+            <span>Read Slack channels</span>
+            <span>Create &amp; manage scheduled tasks</span>
+            <span>Post to Slack</span>
+            <span>Remember user preferences</span>
+            <span>Generate &amp; save reports</span>
+          </div>
+        </div>
+        <div class="card" style="flex: 1;">
+          <div class="card-title">📡 Live updates</div>
+          <div class="card-sub">Progress and results stream back to the user in real time</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">
+      <svg width="32" height="30" viewBox="0 0 32 30">
+        <line x1="16" y1="0" x2="16" y2="20" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="3,2.5"/>
+        <polyline points="10,17 16,28 22,17" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linejoin="round"/>
+      </svg>
+      <div class="arrow-label">delegated to sandbox</div>
+    </div>
+
+    <!-- Layer 5: Sandbox -->
+    <div class="layer">
+      <div class="layer-label">Isolated Execution Environment</div>
+      <div class="cards">
+        <div class="card primary">
+          <div class="card-title">Ephemeral sandbox</div>
+          <div class="card-sub">Each task runs in an isolated cloud environment that terminates when work is done — credentials don't persist</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Pluggable runtimes</div>
+          <div class="card-sub">AWS ECS in production · E2B Cloud or Docker for dev. Any AI coding agent can run inside</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Reused within a session</div>
+          <div class="card-sub">The same environment persists across turns in a conversation — the agent builds up context as work progresses</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">
+      <svg width="32" height="30" viewBox="0 0 32 30">
+        <line x1="16" y1="0" x2="16" y2="20" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="3,2.5"/>
+        <polyline points="10,17 16,28 22,17" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linejoin="round"/>
+      </svg>
+      <div class="arrow-label">persisted</div>
+    </div>
+
+    <!-- Layer 6: Task Execution Record -->
+    <div class="layer">
+      <div class="layer-label">Task Execution Record</div>
+      <div class="cards" style="flex-wrap: nowrap; align-items: stretch;">
+        <div class="card primary" style="flex: 1;">
+          <div class="card-title">📥 Request</div>
+          <div class="card-sub">Every task — on-demand or scheduled — is recorded at intake before work begins</div>
+        </div>
+        <div class="card" style="flex: 1;">
+          <div class="card-title">🏃 Run</div>
+          <div class="card-sub">Each execution attempt is tracked with its status, duration, and cost — supports retries</div>
+        </div>
+        <div class="card" style="flex: 1;">
+          <div class="card-title">📋 Logs</div>
+          <div class="card-sub">A structured timeline of every event within the run — visible in the scheduled tasks dashboard</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">
+      <svg width="32" height="30" viewBox="0 0 32 30">
+        <line x1="16" y1="0" x2="16" y2="20" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="3,2.5"/>
+        <polyline points="10,17 16,28 22,17" fill="none" stroke="#d1d5db" stroke-width="1.5" stroke-linejoin="round"/>
+      </svg>
+      <div class="arrow-label">stored</div>
+    </div>
+
+    <!-- Layer 7: Persistence -->
+    <div class="layer">
+      <div class="layer-label">Persistence · Postgres</div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">Conversations</div>
+          <div class="card-sub">Full history persists across sessions · reused across scheduled task runs so agents build context over time</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Run History</div>
+          <div class="card-sub">Every task run is recorded end-to-end — visible in the scheduled tasks dashboard with logs and artifacts</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Agent Configuration</div>
+          <div class="card-sub">Agent definitions and schedules live in the database — no config files, deployable without a code change</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Artifacts</div>
+          <div class="card-sub">Files, reports, and exports generated by agents are stored and downloadable from the web UI</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /diagram -->
+
+  <hr />
+
+  <!-- Design Principles -->
+  <h2>Design Principles</h2>
+  <div class="principles">
+    <div class="principle">
+      <h3>Infrastructure, not a product</h3>
+      <p>Earnest Agents is not an application — it is a platform. New agent workflows are added by writing a configuration and a markdown skill file, with no code changes to the platform itself. The goal is infrastructure that other teams can build on.</p>
+    </div>
+    <div class="principle">
+      <h3>One worker per conversation</h3>
+      <p>One worker handles one conversation at a time, in order. Follow-up messages are bundled into the current run rather than queued separately — the agent sees the full context without losing correctness.</p>
+    </div>
+    <div class="principle">
+      <h3>Pluggable at every layer</h3>
+      <p>The AI model, execution environment, and tool set are all swappable without changes to the platform. Teams can bring their own model or runtime. The system is not locked to any vendor.</p>
+    </div>
+    <div class="principle">
+      <h3>Persistent context, not stateless calls</h3>
+      <p>Conversations persist across sessions. Scheduled tasks reuse the same conversation across runs, letting the agent build understanding over time — detecting trends, not just point-in-time snapshots.</p>
+    </div>
+    <div class="principle">
+      <h3>Security as a first-class constraint</h3>
+      <p>Every channel has its own authentication layer. Credentials are scoped per user and never shared across agents. Execution environments are ephemeral. Every action the agent takes is an explicit, named operation — not free-form access.</p>
+    </div>
+    <div class="principle">
+      <h3>Full observability built in</h3>
+      <p>Every task run is recorded end-to-end. Cost is tracked and surfaced in real time. The scheduled tasks dashboard gives operators full visibility into what ran, what it produced, and what it cost.</p>
+    </div>
+  </div>
+
+  <hr />
+
+  <!-- What might be possible -->
+  <h2>What might be possible</h2>
+  <p style="font-size:14px; color:#6b7280; margin-bottom:24px; max-width:640px;">
+    The infrastructure is general-purpose — any capability an agent needs can be expressed as a skill or a tool. These are not hypotheticals; each scenario below builds directly on what the platform already does today.
+  </p>
+  <div class="cap-grid">
+    <div class="cap">
+      <h3>End-to-end feature delivery</h3>
+      <p>An engineer describes a change in plain language. An agent reads the relevant code, writes the implementation, runs the tests, and opens a pull request with a full description — without anyone touching a terminal.</p>
+    </div>
+    <div class="cap">
+      <h3>Proactive incident response</h3>
+      <p>A scheduled agent queries New Relic for error rates and latency anomalies every few minutes. When something looks wrong it posts a structured summary to Slack with a direct link — before an on-call engineer would have noticed.</p>
+    </div>
+    <div class="cap">
+      <h3>Automated security scanning</h3>
+      <p>An agent runs dependency audits and SAST tools inside an isolated sandbox on a schedule or triggered by a PR. Findings are summarized in plain language and routed to the right team in Slack.</p>
+    </div>
+    <div class="cap">
+      <h3>Deployment intelligence</h3>
+      <p>An agent monitors deployment pipelines, correlates a new deploy with a spike in errors, and either flags it immediately or escalates with the evidence already assembled — minutes, not hours.</p>
+    </div>
+    <div class="cap">
+      <h3>Research and synthesis</h3>
+      <p>An agent searches documentation, browses external resources, reads code history, and produces a written analysis or decision brief. New Relic dashboards, GitHub history, Confluence pages — all fair game.</p>
+    </div>
+    <div class="cap">
+      <h3>Team-specific agents</h3>
+      <p>Any team can define an agent with a custom identity, its own skills, and access to exactly the tools it needs — deployed without a platform code change. A lending agent, a compliance agent, a data agent — each scoped to its domain.</p>
+    </div>
+    <div class="cap">
+      <h3>Continuous code review</h3>
+      <p>Every pull request reviewed automatically against Earnest conventions before a human looks at it. Not a generic linter — a reviewer with context about the codebase that leaves structured comments directly in the PR.</p>
+    </div>
+    <div class="cap">
+      <h3>Compounding institutional memory</h3>
+      <p>Agents reuse the same conversation across scheduled runs, accumulating context over time. A monitoring agent that remembers what normal looked like last quarter. An engineering agent that knows how you prefer your code structured.</p>
+    </div>
+    <div class="cap">
+      <h3>Arbitrary code execution</h3>
+      <p>Any task that can be expressed as code can be delegated — data transformations, report generation, database queries, API calls. The sandbox is isolated and ephemeral, so there is no risk to production systems.</p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Earnest Engineering · Internal</span>
+  </div>
+
+</body>
+</html>

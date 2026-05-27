@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infra Provisioning Automation</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f8fafc;
+    color: #1e293b;
+    line-height: 1.6;
+  }
+
+  /* ── Nav ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    gap: 2rem;
+    padding: 1rem 2rem;
+    align-items: center;
+  }
+  nav span { font-size: .75rem; color: #94a3b8; text-transform: uppercase; letter-spacing: .1em; font-weight: 600; }
+  nav a {
+    font-size: .85rem;
+    color: #64748b;
+    text-decoration: none;
+    transition: color .2s;
+  }
+  nav a:hover { color: #7c3aed; }
+  nav a.active { color: #7c3aed; font-weight: 600; border-bottom: 2px solid #7c3aed; padding-bottom: 2px; }
+
+  /* ── Layout ── */
+  .page { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; }
+
+  h1 { font-size: 2.4rem; font-weight: 700; color: #0f172a; margin-bottom: .5rem; }
+  h2 { font-size: 1.5rem; font-weight: 600; color: #0f172a; margin-bottom: 1.5rem; }
+  h3 { font-size: .95rem; font-weight: 700; margin-bottom: .75rem; text-transform: uppercase; letter-spacing: .06em; }
+  .subtitle { color: #64748b; font-size: 1.05rem; margin-bottom: 3rem; }
+
+  /* ── Section ── */
+  section { margin-bottom: 5rem; }
+  .section-label {
+    display: inline-block;
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    padding: .25rem .75rem;
+    border-radius: 999px;
+    margin-bottom: 1rem;
+    font-weight: 700;
+  }
+  .label-blue   { background: #dbeafe; color: #1d4ed8; }
+  .label-purple { background: #ede9fe; color: #6d28d9; }
+  .label-green  { background: #dcfce7; color: #15803d; }
+  .label-amber  { background: #fef3c7; color: #b45309; }
+
+  /* ── Before / After columns ── */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  .col-before h3 { color: #dc2626; }
+  .col-after  h3 { color: #16a34a; }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    font-size: .78rem;
+    color: #64748b;
+  }
+  .legend-item { display: flex; align-items: center; gap: .4rem; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* ── Timeline ── */
+  .timeline { position: relative; padding-left: 2rem; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 0; bottom: 0;
+    width: 2px;
+    background: #e2e8f0;
+  }
+  .tl-item {
+    position: relative;
+    margin-bottom: .85rem;
+    padding: .9rem 1.1rem;
+    border-radius: 10px;
+    border: 1px solid;
+    font-size: .82rem;
+  }
+  .tl-dot {
+    position: absolute;
+    left: -1.85rem;
+    top: 1rem;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 2px solid #f8fafc;
+  }
+  .tl-title { font-weight: 600; color: #0f172a; margin-bottom: .2rem; font-size: .83rem; }
+  .tl-desc  { color: #64748b; font-size: .75rem; line-height: 1.45; }
+  .tl-time  {
+    display: inline-block;
+    font-size: .68rem;
+    margin-top: .4rem;
+    padding: .15rem .5rem;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+  }
+
+  /* Step type colors — light */
+  .tl-human  { background: #fffbeb; border-color: #fde68a; }
+  .tl-human .tl-dot  { background: #f59e0b; }
+
+  .tl-wait   { background: #eff6ff; border-color: #bfdbfe; }
+  .tl-wait .tl-dot   { background: #3b82f6; }
+
+  .tl-auto   { background: #f0fdf4; border-color: #bbf7d0; }
+  .tl-auto .tl-dot   { background: #22c55e; }
+
+  .tl-ai     { background: #faf5ff; border-color: #ddd6fe; }
+  .tl-ai .tl-dot     { background: #8b5cf6; }
+
+  .tl-gone   { background: #f8fafc; border-color: #e2e8f0; opacity: .45; }
+  .tl-gone .tl-dot   { background: #cbd5e1; }
+
+  /* ── One-click vision ── */
+  .vision-wrap {
+    background: linear-gradient(135deg, #faf5ff 0%, #eff6ff 50%, #f0fdf4 100%);
+    border: 1px solid #ddd6fe;
+    border-radius: 16px;
+    padding: 2.5rem;
+  }
+  .vision-input {
+    background: #fff;
+    border: 1.5px solid #a78bfa;
+    border-radius: 10px;
+    padding: 1.1rem 1.5rem;
+    font-size: .95rem;
+    color: #1e293b;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 2px 12px rgba(124,58,237,.08);
+  }
+  .vision-input .cursor {
+    display: inline-block;
+    width: 2px; height: 1.1em;
+    background: #7c3aed;
+    animation: blink 1s step-end infinite;
+    vertical-align: text-bottom;
+    flex-shrink: 0;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .vision-phase {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 1.25rem 1rem;
+    font-size: .8rem;
+    text-align: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  }
+  .vision-phase .phase-num {
+    font-size: .65rem;
+    color: #7c3aed;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    margin-bottom: .5rem;
+    font-weight: 700;
+  }
+  .vision-phase .phase-icon { font-size: 1.6rem; margin-bottom: .5rem; }
+  .vision-phase .phase-title { font-weight: 700; color: #0f172a; margin-bottom: .3rem; font-size: .82rem; }
+  .vision-phase .phase-items { color: #64748b; font-size: .72rem; line-height: 1.6; }
+  .phase-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #cbd5e1;
+    font-size: 1.4rem;
+    padding-top: 1.8rem;
+  }
+
+  .vision-output {
+    background: #fff;
+    border: 1px solid #bbf7d0;
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    font-size: .82rem;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+  .vision-output .out-line { margin-bottom: .3rem; color: #15803d; }
+  .vision-output .out-line::before { content: '✓ '; color: #22c55e; }
+  .vision-output .out-final { color: #6d28d9; font-weight: 600; margin-top: .5rem; }
+  .vision-output .out-final::before { content: '⚡ '; }
+
+  /* ── Summary cards ── */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  .summary-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  }
+  .summary-card .metric { font-size: 2rem; font-weight: 700; margin-bottom: .25rem; }
+  .summary-card .metric-label { color: #64748b; font-size: .82rem; font-weight: 600; }
+  .summary-card .metric-desc  { color: #94a3b8; font-size: .78rem; margin-top: .5rem; }
+  .c-purple { color: #7c3aed; }
+  .c-green  { color: #16a34a; }
+  .c-blue   { color: #2563eb; }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e2e8f0 30%, #e2e8f0 70%, transparent);
+    margin: 4rem 0;
+  }
+
+  /* ── Pill row ── */
+  .pill-row { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: 1rem; }
+  .pill {
+    font-size: .71rem;
+    padding: .2rem .65rem;
+    border-radius: 999px;
+    border: 1px solid;
+    font-weight: 500;
+  }
+  .pill-red    { border-color: #fca5a5; color: #dc2626; background: #fff1f1; }
+  .pill-green  { border-color: #86efac; color: #16a34a; background: #f0fdf4; }
+  .pill-purple { border-color: #c4b5fd; color: #6d28d9; background: #faf5ff; }
+
+  @media (max-width: 900px) {
+    .compare { grid-template-columns: 1fr; }
+    .summary-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ── Tab pages ── */
+  .tab-page { display: none; }
+  .tab-page.active { display: block; }
+
+  /* ── Tree / flowchart ── */
+  .tree-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+  .tree-root {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+  }
+  .tree-node {
+    border-radius: 10px;
+    border: 1px solid;
+    padding: .65rem 1rem;
+    font-size: .8rem;
+    font-weight: 600;
+    text-align: center;
+    position: relative;
+    min-width: 180px;
+    max-width: 220px;
+  }
+  .tree-node-sub {
+    font-size: .72rem;
+    font-weight: 400;
+    margin-top: .2rem;
+    opacity: .8;
+  }
+  .tree-connector-v {
+    width: 2px;
+    height: 20px;
+    background: #cbd5e1;
+    margin: 0 auto;
+  }
+  .tree-connector-branch {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    position: relative;
+    width: 100%;
+    justify-content: center;
+  }
+  .tree-branch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    max-width: 220px;
+  }
+  .tree-h-line {
+    height: 2px;
+    background: #cbd5e1;
+    width: 100%;
+    margin-top: 20px;
+    position: relative;
+  }
+  .tree-branch-connector {
+    display: flex;
+    width: 100%;
+    position: relative;
+    justify-content: center;
+  }
+  .tree-branch-connector::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 20px;
+    width: 2px;
+    background: #cbd5e1;
+  }
+
+  /* node color variants */
+  .tn-human  { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+  .tn-auto   { background: #f0fdf4; border-color: #bbf7d0; color: #14532d; }
+  .tn-ai     { background: #faf5ff; border-color: #ddd6fe; color: #4c1d95; }
+  .tn-eng    { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+  .tn-warn   { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
+  .tn-grey   { background: #f8fafc; border-color: #e2e8f0; color: #475569; }
+  .tn-new    { background: #faf5ff; border-color: #a78bfa; color: #4c1d95; }
+
+  .tree-label {
+    font-size: .65rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    font-weight: 700;
+    margin-bottom: .5rem;
+    color: #94a3b8;
+  }
+
+  /* flow step rows */
+  .flow-step {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    margin-bottom: .5rem;
+  }
+  .flow-step-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .7rem; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .flow-step-body { flex: 1; }
+  .flow-step-title { font-weight: 600; font-size: .82rem; color: #0f172a; }
+  .flow-step-desc  { font-size: .74rem; color: #64748b; line-height: 1.4; }
+  .flow-arrow {
+    text-align: center;
+    color: #cbd5e1;
+    font-size: 1.1rem;
+    margin-left: 36px;
+    margin-bottom: .25rem;
+  }
+  .flow-section-label {
+    font-size: .68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    padding: .25rem .75rem;
+    border-radius: 999px;
+    margin-bottom: .75rem;
+    display: inline-block;
+  }
+
+</style>
+</head>
+<body>
+
+<nav>
+  <span>Infra Provisioning Automation</span>
+  <a href="#" class="tab-link active" data-tab="main">Vision</a>
+  <a href="#" class="tab-link" data-tab="new-resource">Adding a New Resource Type</a>
+</nav>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.tab-link').forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        var tab = this.getAttribute('data-tab');
+        document.querySelectorAll('.tab-link').forEach(function(l) { l.classList.remove('active'); });
+        this.classList.add('active');
+        document.querySelectorAll('.tab-page').forEach(function(p) { p.classList.remove('active'); });
+        document.getElementById('tab-' + tab).classList.add('active');
+      });
+    });
+  });
+</script>
+
+<div id="tab-main" class="tab-page active">
+<div class="page">
+
+  <!-- Hero -->
+  <h1>Infra Provisioning Automation</h1>
+  <p class="subtitle">Evolving infrastructure provisioning from static scripts to intelligent, agentic pipelines — without replacing the stack.</p>
+
+  <!-- ── Current Pipeline ── -->
+  <section style="margin-bottom:3rem;">
+    <div class="section-label label-blue" style="margin-bottom:1.25rem;">Current Process</div>
+
+    <!-- Pipeline flow -->
+    <div style="display:flex; align-items:center; gap:0; flex-wrap:wrap; margin-bottom:2rem; background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:1.5rem 2rem;">
+
+      <div style="display:flex; flex-direction:column; align-items:center; gap:.4rem; min-width:100px;">
+        <div style="font-size:1.4rem;">📋</div>
+        <div style="font-size:.75rem; font-weight:700; color:#0f172a; text-align:center;">Port Form</div>
+        <div style="font-size:.68rem; color:#64748b; text-align:center;">Engineer fills structured inputs</div>
+        <div style="font-size:.63rem; background:#fef3c7; color:#92400e; border:1px solid #fde68a; border-radius:999px; padding:.1rem .5rem; margin-top:.2rem;">human</div>
+      </div>
+
+      <div style="color:#cbd5e1; font-size:1.3rem; padding:0 .75rem; padding-bottom:1.2rem;">→</div>
+
+      <div style="display:flex; flex-direction:column; align-items:center; gap:.4rem; min-width:100px;">
+        <div style="font-size:1.4rem;">✅</div>
+        <div style="font-size:.75rem; font-weight:700; color:#0f172a; text-align:center;">Port Approval</div>
+        <div style="font-size:.68rem; color:#64748b; text-align:center;">Mandatory gate before workflow fires</div>
+        <div style="font-size:.63rem; background:#fef3c7; color:#92400e; border:1px solid #fde68a; border-radius:999px; padding:.1rem .5rem; margin-top:.2rem;">human</div>
+      </div>
+
+      <div style="color:#cbd5e1; font-size:1.3rem; padding:0 .75rem; padding-bottom:1.2rem;">→</div>
+
+      <div style="display:flex; flex-direction:column; align-items:center; gap:.4rem; min-width:120px;">
+        <div style="font-size:1.4rem;">⚙️</div>
+        <div style="font-size:.75rem; font-weight:700; color:#0f172a; text-align:center;">GitHub Workflows</div>
+        <div style="font-size:.68rem; color:#64748b; text-align:center;">orchestrate-*.yml triggers</div>
+        <div style="font-size:.63rem; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; border-radius:999px; padding:.1rem .5rem; margin-top:.2rem;">auto</div>
+      </div>
+
+      <div style="color:#cbd5e1; font-size:1.3rem; padding:0 .75rem; padding-bottom:1.2rem;">→</div>
+
+      <div style="display:flex; flex-direction:column; align-items:center; gap:.4rem; min-width:130px;">
+        <div style="font-size:1.4rem;">🔧</div>
+        <div style="font-size:.75rem; font-weight:700; color:#0f172a; text-align:center;">Bash Action</div>
+        <div style="font-size:.68rem; color:#64748b; text-align:center;">~500 lines per resource type</div>
+        <div style="font-size:.63rem; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; border-radius:999px; padding:.1rem .5rem; margin-top:.2rem;">auto</div>
+      </div>
+
+      <div style="color:#cbd5e1; font-size:1.3rem; padding:0 .75rem; padding-bottom:1.2rem;">→</div>
+
+      <div style="display:flex; flex-direction:column; align-items:center; gap:.4rem; min-width:110px;">
+        <div style="font-size:1.4rem;">📂</div>
+        <div style="font-size:.75rem; font-weight:700; color:#0f172a; text-align:center;">PR to Legoland</div>
+        <div style="font-size:.68rem; color:#64748b; text-align:center;">Generated .tf files</div>
+        <div style="font-size:.63rem; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; border-radius:999px; padding:.1rem .5rem; margin-top:.2rem;">auto</div>
+      </div>
+
+      <div style="color:#cbd5e1; font-size:1.3rem; padding:0 .75rem; padding-bottom:1.2rem;">→</div>
+
+      <div style="display:flex; flex-direction:column; align-items:center; gap:.4rem; min-width:120px;">
+        <div style="font-size:1.4rem;">🔍</div>
+        <div style="font-size:.75rem; font-weight:700; color:#0f172a; text-align:center;">env0 Plans</div>
+        <div style="font-size:.68rem; color:#64748b; text-align:center;">Watches PR, runs tofu plan</div>
+        <div style="font-size:.63rem; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; border-radius:999px; padding:.1rem .5rem; margin-top:.2rem;">auto</div>
+      </div>
+
+      <div style="color:#cbd5e1; font-size:1.3rem; padding:0 .75rem; padding-bottom:1.2rem;">→</div>
+
+      <div style="display:flex; flex-direction:column; align-items:center; gap:.4rem; min-width:110px;">
+        <div style="font-size:1.4rem;">👤</div>
+        <div style="font-size:.75rem; font-weight:700; color:#0f172a; text-align:center;">env0 Approval</div>
+        <div style="font-size:.68rem; color:#64748b; text-align:center;">Reviews plan, approves apply</div>
+        <div style="font-size:.63rem; background:#fef3c7; color:#92400e; border:1px solid #fde68a; border-radius:999px; padding:.1rem .5rem; margin-top:.2rem;">if configured</div>
+      </div>
+
+      <div style="color:#cbd5e1; font-size:1.3rem; padding:0 .75rem; padding-bottom:1.2rem;">→</div>
+
+      <div style="display:flex; flex-direction:column; align-items:center; gap:.4rem; min-width:110px;">
+        <div style="font-size:1.4rem;">🚀</div>
+        <div style="font-size:.75rem; font-weight:700; color:#0f172a; text-align:center;">Apply + Notify</div>
+        <div style="font-size:.68rem; color:#64748b; text-align:center;">tofu apply, Slack notification</div>
+        <div style="font-size:.63rem; background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0; border-radius:999px; padding:.1rem .5rem; margin-top:.2rem;">auto</div>
+      </div>
+
+    </div>
+
+    <!-- 3 improvement areas -->
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.25rem;">
+
+      <div style="background:#fff; border:2px solid #a78bfa; border-radius:12px; padding:1.25rem 1.5rem; position:relative;">
+        <div style="position:absolute; top:-11px; left:1rem; background:#7c3aed; color:#fff; font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; padding:.2rem .65rem; border-radius:999px;">Improvement 1</div>
+        <div style="font-size:1.3rem; margin-bottom:.5rem;">💬</div>
+        <div style="font-weight:700; color:#0f172a; font-size:.9rem; margin-bottom:.4rem;">Conversational Interface</div>
+        <div style="font-size:.78rem; color:#64748b; line-height:1.6;">Replace Port forms with natural language. Engineer states intent in Slack or a comment. Agent extracts parameters, confirms, triggers the workflow. No form to fill, no lookup required.</div>
+        <div style="margin-top:.75rem; font-size:.72rem; color:#7c3aed; font-weight:600;">Replaces: Port form + Port approval gate</div>
+      </div>
+
+      <div style="background:#fff; border:2px solid #a78bfa; border-radius:12px; padding:1.25rem 1.5rem; position:relative;">
+        <div style="position:absolute; top:-11px; left:1rem; background:#7c3aed; color:#fff; font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; padding:.2rem .65rem; border-radius:999px;">Improvement 2</div>
+        <div style="font-size:1.3rem; margin-bottom:.5rem;">🤖</div>
+        <div style="font-weight:700; color:#0f172a; font-size:.9rem; margin-bottom:.4rem;">LLM Legoland Writer</div>
+        <div style="font-size:.78rem; color:#64748b; line-height:1.6;">Replace per-resource bash actions with a single LLM action. Reads legoland context and existing patterns, generates correct idiomatic OpenTofu for any resource type. No new bash script per resource type.</div>
+        <div style="margin-top:.75rem; font-size:.72rem; color:#7c3aed; font-weight:600;">Replaces: bash action per resource type</div>
+      </div>
+
+      <div style="background:#fff; border:2px solid #a78bfa; border-radius:12px; padding:1.25rem 1.5rem; position:relative;">
+        <div style="position:absolute; top:-11px; left:1rem; background:#7c3aed; color:#fff; font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; padding:.2rem .65rem; border-radius:999px;">Improvement 3</div>
+        <div style="font-size:1.3rem; margin-bottom:.5rem;">🔍</div>
+        <div style="font-weight:700; color:#0f172a; font-size:.9rem; margin-bottom:.4rem;">LLM Plan Reviewer</div>
+        <div style="font-size:.78rem; color:#64748b; line-height:1.6;">Replace manual env0 plan review with an AI reviewer. Classifies risk, auto-approves safe additions via env0 API, sends plain-English summary to engineer. Human only involved for genuinely risky changes.</div>
+        <div style="margin-top:.75rem; font-size:.72rem; color:#7c3aed; font-weight:600;">Replaces: manual env0 plan review + approval</div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div> Human step required</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div> Automated waiting / polling</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#22c55e"></div> Automated execution</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div> AI-handled</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#cbd5e1"></div> Eliminated entirely</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── SECTION 1: RDS Database ── -->
+  <section id="simple">
+    <div class="section-label label-blue">Example 1</div>
+    <h2>Creating a New RDS Database</h2>
+    <p style="color:#64748b; font-size:.88rem; margin-bottom:2rem;">Engineer wants a PostgreSQL database for their service. Simple, self-contained. But today it requires a dedicated per-resource action, brittle bash generation, and multiple human gates — starting before the GitHub workflow even fires.</p>
+
+    <!-- Resource proliferation callout -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-bottom:2rem;">
+
+      <div style="background:#fff8f8; border:1px solid #fca5a5; border-radius:12px; padding:1.25rem 1.5rem;">
+        <div style="font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#dc2626; margin-bottom:.75rem;">Today — One action per resource type</div>
+        <div style="display:flex; flex-direction:column; gap:.5rem;">
+          <div style="display:flex; align-items:center; gap:.6rem; font-size:.8rem; color:#1e293b; background:#fff1f1; border:1px solid #fecaca; border-radius:7px; padding:.5rem .75rem;">
+            <span>🔧</span> <code style="font-size:.75rem; color:#dc2626;">actions/create-postgresql-database/action.yml</code>
+          </div>
+          <div style="display:flex; align-items:center; gap:.6rem; font-size:.8rem; color:#1e293b; background:#fff1f1; border:1px solid #fecaca; border-radius:7px; padding:.5rem .75rem;">
+            <span>🔧</span> <code style="font-size:.75rem; color:#dc2626;">actions/create-sqs/action.yml</code>
+          </div>
+          <div style="display:flex; align-items:center; gap:.6rem; font-size:.8rem; color:#1e293b; background:#fff1f1; border:1px solid #fecaca; border-radius:7px; padding:.5rem .75rem;">
+            <span>🔧</span> <code style="font-size:.75rem; color:#dc2626;">actions/create-s3-bucket/action.yml</code>
+          </div>
+          <div style="display:flex; align-items:center; gap:.6rem; font-size:.8rem; color:#1e293b; background:#fff1f1; border:1px solid #fecaca; border-radius:7px; padding:.5rem .75rem;">
+            <span>🔧</span> <code style="font-size:.75rem; color:#dc2626;">actions/legoland-infra-files/action.yml</code>
+          </div>
+          <div style="font-size:.72rem; color:#94a3b8; margin-top:.25rem; padding-left:.25rem;">Each is ~500 lines of bash. Every new resource type requires a new action from scratch.</div>
+        </div>
+      </div>
+
+      <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:12px; padding:1.25rem 1.5rem;">
+        <div style="font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#16a34a; margin-bottom:.75rem;">After — One action for everything</div>
+        <div style="display:flex; flex-direction:column; gap:.5rem;">
+          <div style="display:flex; align-items:center; gap:.6rem; font-size:.8rem; color:#1e293b; background:#dcfce7; border:1px solid #86efac; border-radius:7px; padding:.5rem .75rem;">
+            <span>🤖</span> <code style="font-size:.75rem; color:#16a34a;">actions/llm-legoland-writer/action.yml</code>
+          </div>
+          <div style="font-size:.78rem; color:#15803d; background:#dcfce7; border:1px solid #86efac; border-radius:7px; padding:.6rem .75rem; line-height:1.5;">
+            Inputs: <code style="font-size:.73rem;">resource-type</code>, <code style="font-size:.73rem;">params</code>, <code style="font-size:.73rem;">project-name</code>, <code style="font-size:.73rem;">environments</code><br>
+            Reads legoland context → sends to Claude → writes files.<br>
+            Works for <strong>any</strong> resource type, including ones that don't exist yet.
+          </div>
+          <div style="font-size:.72rem; color:#94a3b8; margin-top:.25rem; padding-left:.25rem;">Adding a new resource type is a prompt change, not a new 500-line bash script.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="compare">
+
+      <div class="compare-col col-before">
+        <h3>Today — ~2 to 4 hours (elapsed)</h3>
+        <div class="timeline">
+
+          <div class="tl-item tl-human">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Fill Port Form</div>
+            <div class="tl-desc">Engineer looks up project name, sub-project name, environments. Fills structured form.</div>
+            <span class="tl-time">Human • ~15 min</span>
+          </div>
+
+          <div class="tl-item tl-human">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Port Approval Gate</div>
+            <div class="tl-desc">Mandatory approval configured on the Port action (<code style="font-size:.72rem; background:#fef9c3; padding:.1rem .3rem; border-radius:3px;">requiredApproval: ANY</code>). A designated approver must approve in Port before the GitHub workflow is even triggered. The pipeline is blocked until this happens.</div>
+            <span class="tl-time">Human • variable (minutes to hours)</span>
+          </div>
+
+          <div class="tl-item tl-auto">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Resource-Specific Bash Action Runs</div>
+            <div class="tl-desc"><code style="font-size:.72rem; background:#f1f5f9; padding:.1rem .3rem; border-radius:3px;">create-postgresql-database/action.yml</code> — 500 lines of bash that grep, splice, and string-manipulate postgresql.tf, variables.tf, outputs.tf into legoland. A completely separate action would run for SQS, S3, etc.</div>
+            <span class="tl-time">Auto • ~2 min</span>
+          </div>
+
+          <div class="tl-item tl-auto">
+            <div class="tl-dot"></div>
+            <div class="tl-title">PR Opened Against Legoland</div>
+            <div class="tl-desc">Branch created, PR opened. env0 picks it up and runs tofu plan.</div>
+            <span class="tl-time">Auto • ~3 min</span>
+          </div>
+
+          <div class="tl-item tl-human">
+            <div class="tl-dot"></div>
+            <div class="tl-title">env0 Plan Review (if env0 approval is enabled)</div>
+            <div class="tl-desc">If the env0 environment is configured to require approval, engineer receives a Slack notification with the plan URL and must navigate to env0 to review and approve. Whether this gate is active depends on env0 environment settings — the workflow warns but cannot enforce it.</div>
+            <span class="tl-time">Human • ~30–40 min (context switch, when required)</span>
+          </div>
+
+          <div class="tl-item tl-wait">
+            <div class="tl-dot"></div>
+            <div class="tl-title">env0 Applies</div>
+            <div class="tl-desc">Tofu apply runs. Workflow polls for terminal status (success/failure). No awareness of mid-run approval states.</div>
+            <span class="tl-time">Wait • ~10 min</span>
+          </div>
+
+          <div class="tl-item tl-auto">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Slack: DB Details + Secret ARN</div>
+            <div class="tl-desc">Engineer notified with database name, ID, and Secrets Manager ARN for credentials.</div>
+            <span class="tl-time">Auto • instant</span>
+          </div>
+
+        </div>
+        <div class="pill-row">
+          <span class="pill pill-red">1 action per resource type</span>
+          <span class="pill pill-red">Port approval gate before workflow starts</span>
+          <span class="pill pill-red">env0 approval gate (if configured)</span>
+          <span class="pill pill-red">Manual plan review</span>
+        </div>
+      </div>
+
+      <div class="compare-col col-after">
+        <h3>After AI Transformation — ~15 min (elapsed)</h3>
+        <div class="timeline">
+
+          <div class="tl-item tl-human">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Natural Language Request</div>
+            <div class="tl-desc">"Add a Postgres database for payments-service in staging and production."</div>
+            <span class="tl-time">Human • ~1 min</span>
+          </div>
+
+          <div class="tl-item tl-ai">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Single LLM Action Writes OpenTofu Files</div>
+            <div class="tl-desc"><code style="font-size:.72rem; background:#ede9fe; padding:.1rem .3rem; border-radius:3px;">llm-legoland-writer/action.yml</code> — reads existing legoland project files and CLAUDE.md conventions, then generates correct, idiomatic postgresql.tf, variables.tf, outputs.tf. The same action handles Postgres, SQS, S3, or any future resource type.</div>
+            <span class="tl-time">AI • ~1 min</span>
+          </div>
+
+          <div class="tl-item tl-auto">
+            <div class="tl-dot"></div>
+            <div class="tl-title">PR Opened Against Legoland</div>
+            <div class="tl-desc">Branch created, PR opened. env0 picks it up and runs tofu plan.</div>
+            <span class="tl-time">Auto • ~3 min</span>
+          </div>
+
+          <div class="tl-item tl-ai">
+            <div class="tl-dot"></div>
+            <div class="tl-title">AI Reviews Plan + Auto-Approves</div>
+            <div class="tl-desc">Reads the Terraform plan. Only additions detected — no replacements, no IAM changes. Auto-approves via env0 API. Engineer receives a plain-English summary, not a raw diff.</div>
+            <span class="tl-time">AI • ~1 min</span>
+          </div>
+
+          <div class="tl-item tl-wait">
+            <div class="tl-dot"></div>
+            <div class="tl-title">env0 Applies</div>
+            <div class="tl-desc">Tofu apply runs. Workflow polls for completion status.</div>
+            <span class="tl-time">Wait • ~10 min</span>
+          </div>
+
+          <div class="tl-item tl-auto">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Slack: DB Details + Secret ARN</div>
+            <div class="tl-desc">Engineer notified. Database ready. No env0 login needed.</div>
+            <span class="tl-time">Auto • instant</span>
+          </div>
+
+        </div>
+        <div class="pill-row">
+          <span class="pill pill-green">1 action for all resource types</span>
+          <span class="pill pill-green">1 human touchpoint</span>
+          <span class="pill pill-green">Auto-approved (safe changes)</span>
+          <span class="pill pill-purple">No env0 login required</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── SECTION 2: Service onboarding ── -->
+  <section id="onboarding">
+    <div class="section-label label-purple">Example 2</div>
+    <h2>Onboarding a New Service End-to-End</h2>
+    <p style="color:#64748b; font-size:.88rem; margin-bottom:2rem;">The full journey from "we need a new service" to "it's running in staging." Today this spans days across four systems, two separate Port forms, and six separate actions/workflows — each hand-authored.</p>
+
+    <!-- Workflow + action proliferation callout -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-bottom:2rem;">
+
+      <div style="background:#fff8f8; border:1px solid #fca5a5; border-radius:12px; padding:1.25rem 1.5rem;">
+        <div style="font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#dc2626; margin-bottom:.75rem;">Today — Separate workflow + actions per concern</div>
+        <div style="display:flex; flex-direction:column; gap:.4rem;">
+          <div style="font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#94a3b8; margin-top:.25rem;">Workflows (Port triggers each separately)</div>
+          <div style="display:flex; align-items:center; gap:.6rem; font-size:.8rem; color:#1e293b; background:#fff1f1; border:1px solid #fecaca; border-radius:7px; padding:.45rem .75rem;">
+            <span>⚙️</span> <code style="font-size:.73rem; color:#dc2626;">orchestrate-repository.yml</code>
+          </div>
+          <div style="display:flex; align-items:center; gap:.6rem; font-size:.8rem; color:#1e293b; background:#fff1f1; border:1px solid #fecaca; border-radius:7px; padding:.45rem .75rem;">
+            <span>⚙️</span> <code style="font-size:.73rem; color:#dc2626;">orchestrate-service-onboarding.yml</code>
+          </div>
+          <div style="font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#94a3b8; margin-top:.5rem;">Bash-based composite actions</div>
+          <div style="display:flex; align-items:center; gap:.6rem; font-size:.8rem; color:#1e293b; background:#fff1f1; border:1px solid #fecaca; border-radius:7px; padding:.45rem .75rem;">
+            <span>🔧</span> <code style="font-size:.73rem; color:#dc2626;">actions/legoland-project-creator</code>
+          </div>
+          <div style="display:flex; align-items:center; gap:.6rem; font-size:.8rem; color:#1e293b; background:#fff1f1; border:1px solid #fecaca; border-radius:7px; padding:.45rem .75rem;">
+            <span>🔧</span> <code style="font-size:.73rem; color:#dc2626;">actions/legoland-infra-files</code>
+          </div>
+          <div style="display:flex; align-items:center; gap:.6rem; font-size:.8rem; color:#1e293b; background:#fff1f1; border:1px solid #fecaca; border-radius:7px; padding:.45rem .75rem;">
+            <span>🔧</span> <code style="font-size:.73rem; color:#dc2626;">actions/create-repo</code>
+          </div>
+          <div style="display:flex; align-items:center; gap:.6rem; font-size:.8rem; color:#1e293b; background:#fff1f1; border:1px solid #fecaca; border-radius:7px; padding:.45rem .75rem;">
+            <span>🔧</span> <code style="font-size:.73rem; color:#dc2626;">actions/env0-project-creator</code>
+          </div>
+          <div style="font-size:.72rem; color:#94a3b8; margin-top:.25rem; padding-left:.25rem;">Two Port forms. Two manual env0 approvals. Each action generates config for one specific concern. Human required to stitch it all together.</div>
+        </div>
+      </div>
+
+      <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:12px; padding:1.25rem 1.5rem;">
+        <div style="font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#16a34a; margin-bottom:.75rem;">After — One agent orchestrates everything</div>
+        <div style="display:flex; flex-direction:column; gap:.4rem;">
+          <div style="font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#94a3b8; margin-top:.25rem;">Single unified workflow</div>
+          <div style="display:flex; align-items:center; gap:.6rem; font-size:.8rem; color:#1e293b; background:#dcfce7; border:1px solid #86efac; border-radius:7px; padding:.45rem .75rem;">
+            <span>⚙️</span> <code style="font-size:.73rem; color:#16a34a;">orchestrate-service.yml</code>
+          </div>
+          <div style="font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#94a3b8; margin-top:.5rem;">Single LLM action generates all config</div>
+          <div style="display:flex; align-items:center; gap:.6rem; font-size:.8rem; color:#1e293b; background:#dcfce7; border:1px solid #86efac; border-radius:7px; padding:.45rem .75rem;">
+            <span>🤖</span> <code style="font-size:.73rem; color:#16a34a;">actions/llm-legoland-writer</code>
+          </div>
+          <div style="display:flex; align-items:center; gap:.6rem; font-size:.8rem; color:#1e293b; background:#dcfce7; border:1px solid #86efac; border-radius:7px; padding:.45rem .75rem;">
+            <span>🤖</span> <code style="font-size:.73rem; color:#16a34a;">actions/llm-plan-reviewer</code>
+          </div>
+          <div style="font-size:.78rem; color:#15803d; background:#dcfce7; border:1px solid #86efac; border-radius:7px; padding:.6rem .75rem; line-height:1.5; margin-top:.1rem;">
+            One intent → agent generates repo scaffold, service infra, K8s wiring, and all resource config in a single pass. Reviews and auto-approves all env0 plans. Merges PRs. Triggers first deploy.
+          </div>
+          <div style="font-size:.72rem; color:#94a3b8; margin-top:.25rem; padding-left:.25rem;">No Port forms. No manual env0 approvals. No PR queue. Human only involved at the start.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="compare">
+
+      <div class="compare-col col-before">
+        <h3>Today — ~3 to 5 days</h3>
+        <div class="timeline">
+
+          <!-- Workflow 1 boundary -->
+          <div style="position:relative; margin-left:-2rem; margin-bottom:.6rem; margin-top:.25rem;">
+            <div style="display:inline-flex; align-items:center; gap:.5rem; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; padding:.3rem .75rem; font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:#dc2626;">
+              <span>⚙️</span> Workflow 1 — orchestrate-repository.yml
+            </div>
+          </div>
+
+          <div class="tl-item tl-human">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Fill Port Form — Create GitHub Repo</div>
+            <div class="tl-desc">Engineer looks up team name, Jira project key, Snyk orgs, service flavor. Fills structured form.</div>
+            <span class="tl-time">Human • ~15 min</span>
+          </div>
+
+          <div class="tl-item tl-human">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Port Approval Gate</div>
+            <div class="tl-desc">Mandatory approval on this Port action (<code style="font-size:.72rem; background:#fef9c3; padding:.1rem .3rem; border-radius:3px;">requiredApproval: ANY</code>). A designated approver must act in Port before the GitHub workflow fires. Nothing runs until this is cleared.</div>
+            <span class="tl-time">Human • variable (minutes to hours)</span>
+          </div>
+
+          <div class="tl-item tl-auto">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Bash Generates Legoland Repo Scaffold</div>
+            <div class="tl-desc"><code style="font-size:.72rem; background:#f1f5f9; padding:.1rem .3rem; border-radius:3px;">legoland-project-creator</code> + <code style="font-size:.72rem; background:#f1f5f9; padding:.1rem .3rem; border-radius:3px;">create-repo</code> + <code style="font-size:.72rem; background:#f1f5f9; padding:.1rem .3rem; border-radius:3px;">env0-project-creator</code> run in sequence. Each is a separate hand-authored bash action generating config for one specific concern.</div>
+            <span class="tl-time">Auto • ~5 min</span>
+          </div>
+
+          <div class="tl-item tl-human">
+            <div class="tl-dot"></div>
+            <div class="tl-title">env0 Plan Review (if env0 approval is enabled)</div>
+            <div class="tl-desc">If the env0 environment requires approval, engineer navigates to env0 to review and approve — just to create a GitHub repo. ECR, IAM roles, and base infra are bundled into this step even though the service doesn't exist yet.</div>
+            <span class="tl-time">Human • ~30 min (context switch, when required)</span>
+          </div>
+
+          <div class="tl-item tl-wait">
+            <div class="tl-dot"></div>
+            <div class="tl-title">env0 Deploys Base Infra (Bundled Here Unnecessarily)</div>
+            <div class="tl-desc">Tofu apply creates ECR registry and IAM roles. These are service-level concerns bundled into repo creation — creating a hard sequencing dependency before Workflow 2 can even start. The GitHub repo itself was ready minutes ago.</div>
+            <span class="tl-time">Wait • ~10 min</span>
+          </div>
+
+          <!-- Workflow 2 boundary -->
+          <div style="position:relative; margin-left:-2rem; margin-bottom:.6rem; margin-top:1.1rem;">
+            <div style="display:inline-flex; align-items:center; gap:.5rem; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; padding:.3rem .75rem; font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:#dc2626;">
+              <span>⚙️</span> Workflow 2 — orchestrate-service-onboarding.yml
+            </div>
+            <div style="font-size:.68rem; color:#94a3b8; margin-top:.3rem; padding-left:.1rem;">Engineer must manually trigger this as a separate Port action after Workflow 1 completes.</div>
+          </div>
+
+          <div class="tl-item tl-human">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Fill Port Form — Service Onboarding</div>
+            <div class="tl-desc">18-field form: environments, replica counts per environment, environment variables (key=value pairs), image names, and per-environment conditional inputs. A completely separate Port action from Workflow 1.</div>
+            <span class="tl-time">Human • ~20 min</span>
+          </div>
+
+          <div class="tl-item tl-human">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Port Approval Gate (Again)</div>
+            <div class="tl-desc">Second mandatory Port approval. The service onboarding action also requires <code style="font-size:.72rem; background:#fef9c3; padding:.1rem .3rem; border-radius:3px;">requiredApproval: ANY</code> before the workflow fires. Each Port form submission is an independent approval bottleneck.</div>
+            <span class="tl-time">Human • variable (minutes to hours)</span>
+          </div>
+
+          <div class="tl-item tl-auto">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Vault Role Created</div>
+            <div class="tl-desc">GH Action provisions Vault secrets role for the service.</div>
+            <span class="tl-time">Auto • ~3 min</span>
+          </div>
+
+          <div class="tl-item tl-auto">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Bash Generates Service Legoland Config</div>
+            <div class="tl-desc"><code style="font-size:.72rem; background:#f1f5f9; padding:.1rem .3rem; border-radius:3px;">legoland-infra-files</code> runs — another dedicated bash action generating K8s wiring, service config, and environment variables. Completely separate from the repo scaffold action above.</div>
+            <span class="tl-time">Auto • ~5 min</span>
+          </div>
+
+          <div class="tl-item tl-human">
+            <div class="tl-dot"></div>
+            <div class="tl-title">env0 Plan Review (if env0 approval is enabled)</div>
+            <div class="tl-desc">If the env0 environment requires approval, engineer must review and approve the service infra plan. The workflow sends a Slack warning ("Please check if there are any pending approvals") but cannot block or detect the approval state — it only polls for terminal outcomes.</div>
+            <span class="tl-time">Human • ~30 min (context switch, when required)</span>
+          </div>
+
+          <div class="tl-item tl-wait">
+            <div class="tl-dot"></div>
+            <div class="tl-title">env0 Deploys Service Infra</div>
+            <div class="tl-desc">EKS namespace, service account, IAM role binding applied.</div>
+            <span class="tl-time">Wait • ~15 min</span>
+          </div>
+
+          <div class="tl-item tl-human">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Engineer Merges K8s Wiring PR</div>
+            <div class="tl-desc">ArgoCD app manifest PR needs human review and merge. Workflow polls for merge with a 5-minute timeout window — if not merged in time, the workflow continues without it.</div>
+            <span class="tl-time">Human • ~5-min polling window</span>
+          </div>
+
+          <div class="tl-item tl-wait">
+            <div class="tl-dot"></div>
+            <div class="tl-title">ArgoCD Syncs + Confirms Healthy</div>
+            <div class="tl-desc">Workflow polls ArgoCD until app reports healthy state.</div>
+            <span class="tl-time">Wait • ~10 min</span>
+          </div>
+
+          <!-- Workflow 3 boundary -->
+          <div style="position:relative; margin-left:-2rem; margin-bottom:.6rem; margin-top:1.1rem;">
+            <div style="display:inline-flex; align-items:center; gap:.5rem; background:#fef2f2; border:1px solid #fca5a5; border-radius:6px; padding:.3rem .75rem; font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:#dc2626;">
+              <span>⚙️</span> Workflow 3 — deploy-v2.yml
+            </div>
+            <div style="font-size:.68rem; color:#94a3b8; margin-top:.3rem; padding-left:.1rem;">Triggered manually by engineer, typically days after Workflow 2.</div>
+          </div>
+
+          <div class="tl-item tl-human">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Engineer Triggers First Deploy</div>
+            <div class="tl-desc">Manually trigger deploy-v2 with initial commit SHA. Often done days later.</div>
+            <span class="tl-time">Human • 1–2 days after setup</span>
+          </div>
+
+        </div>
+        <div class="pill-row" style="margin-top:1rem">
+          <span class="pill pill-red">3 separate workflows</span>
+          <span class="pill pill-red">2 Port approval gates</span>
+          <span class="pill pill-red">2 separate Port forms (8 fields then 18 fields)</span>
+          <span class="pill pill-red">env0 approval gates (conditional)</span>
+          <span class="pill pill-red">Days of elapsed time</span>
+        </div>
+      </div>
+
+      <div class="compare-col col-after">
+        <h3>After AI Transformation — ~1 hour</h3>
+        <div class="timeline">
+
+          <!-- Single workflow boundary -->
+          <div style="position:relative; margin-left:-2rem; margin-bottom:.6rem; margin-top:.25rem;">
+            <div style="display:inline-flex; align-items:center; gap:.5rem; background:#f0fdf4; border:1px solid #86efac; border-radius:6px; padding:.3rem .75rem; font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:#16a34a;">
+              <span>⚙️</span> Workflow 1 — orchestrate-service.yml
+            </div>
+            <div style="font-size:.68rem; color:#94a3b8; margin-top:.3rem; padding-left:.1rem;">One workflow handles everything end-to-end. No manual handoff between workflows.</div>
+          </div>
+
+          <div class="tl-item tl-human">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Single Intent Statement</div>
+            <div class="tl-desc">"Create payments-service for the lending team. Needs Postgres and SQS. Deploy to staging."</div>
+            <span class="tl-time">Human • ~2 min</span>
+          </div>
+
+          <div class="tl-item tl-ai">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Agent Extracts + Confirms Parameters</div>
+            <div class="tl-desc">Resolves team name → legoland project name, infers sub-project, confirms intent before proceeding. No form to fill.</div>
+            <span class="tl-time">AI • ~30 sec</span>
+          </div>
+
+          <div class="tl-item tl-ai">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Single LLM Action Generates All Config</div>
+            <div class="tl-desc"><code style="font-size:.72rem; background:#ede9fe; padding:.1rem .3rem; border-radius:3px;">llm-legoland-writer</code> runs once — reads existing patterns across legoland, then writes repo scaffold, service infra, Postgres config, SQS config, and K8s wiring in a single pass. No separate action per concern.</div>
+            <span class="tl-time">AI • ~2 min</span>
+          </div>
+
+          <div class="tl-item tl-auto">
+            <div class="tl-dot"></div>
+            <div class="tl-title">All PRs Opened + Vault Role Created</div>
+            <div class="tl-desc">Repo scaffold PR, service infra PR, and K8s wiring PR opened in parallel. Vault provisioned automatically.</div>
+            <span class="tl-time">Auto • ~3 min</span>
+          </div>
+
+          <div class="tl-item tl-ai">
+            <div class="tl-dot"></div>
+            <div class="tl-title">AI Reviews All env0 Plans</div>
+            <div class="tl-desc">New service = only additions across all plans. All auto-approved via env0 API. Engineer receives a single plain-English summary.</div>
+            <span class="tl-time">AI • ~2 min</span>
+          </div>
+
+          <div class="tl-item tl-wait">
+            <div class="tl-dot"></div>
+            <div class="tl-title">env0 Applies All Environments</div>
+            <div class="tl-desc">Infra and service config deployed in parallel across staging.</div>
+            <span class="tl-time">Wait • ~20 min</span>
+          </div>
+
+          <div class="tl-item tl-ai">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Agent Merges K8s Wiring PR</div>
+            <div class="tl-desc">Only additions, no conflicts. Agent auto-merges after CI passes. No PR queue.</div>
+            <span class="tl-time">AI • ~5 min</span>
+          </div>
+
+          <div class="tl-item tl-wait">
+            <div class="tl-dot"></div>
+            <div class="tl-title">ArgoCD Confirms Healthy</div>
+            <div class="tl-desc">Agent monitors until healthy. Escalates to engineer only if degraded.</div>
+            <span class="tl-time">Wait • ~10 min</span>
+          </div>
+
+          <div class="tl-item tl-ai">
+            <div class="tl-dot"></div>
+            <div class="tl-title">Agent Triggers First Deploy</div>
+            <div class="tl-desc">Initiates deploy-v2 with initial commit SHA automatically. Service is live.</div>
+            <span class="tl-time">AI • ~1 min</span>
+          </div>
+
+        </div>
+        <div class="pill-row" style="margin-top:1rem">
+          <span class="pill pill-green">1 human touchpoint</span>
+          <span class="pill pill-green">Single intent statement</span>
+          <span class="pill pill-green">Hours not days</span>
+          <span class="pill pill-purple">Agent coordinates all 4 systems</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── SECTION 3: One-click vision ── -->
+  <section id="vision">
+    <div class="section-label label-green">North Star Vision</div>
+    <h2>One-Click Service Deployment</h2>
+    <p style="color:#64748b; font-size:.88rem; margin-bottom:2rem;">The logical endpoint of this transformation: a single intent triggers the entire lifecycle — repo creation, infrastructure provisioning, service wiring, and first deployment — with a human only involved for decisions that genuinely require judgment.</p>
+
+    <div class="vision-wrap">
+
+      <div class="vision-input">
+        <span style="color:#7c3aed; font-size:1.2rem; flex-shrink:0">⌘</span>
+        <span>"Launch payments-service for the lending team — Postgres, SQS, staging + production"</span>
+        <span class="cursor"></span>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 40px 1fr 40px 1fr 40px 1fr; align-items:start; gap:.5rem; margin-bottom:2rem">
+
+        <div class="vision-phase">
+          <div class="phase-num">Step 1</div>
+          <div class="phase-icon">🏗️</div>
+          <div class="phase-title">Repo & Team</div>
+          <div class="phase-items">
+            GitHub repo created<br>
+            Team permissions set<br>
+            Jira autolinks<br>
+            Snyk orgs wired<br>
+            Branch protection
+          </div>
+        </div>
+
+        <div class="phase-arrow">→</div>
+
+        <div class="vision-phase">
+          <div class="phase-num">Step 2</div>
+          <div class="phase-icon">🧱</div>
+          <div class="phase-title">Infra Provisioned</div>
+          <div class="phase-items">
+            ECR registry<br>
+            IAM roles<br>
+            Postgres DBs<br>
+            SQS queues<br>
+            Vault secrets role
+          </div>
+        </div>
+
+        <div class="phase-arrow">→</div>
+
+        <div class="vision-phase">
+          <div class="phase-num">Step 3</div>
+          <div class="phase-icon">⚙️</div>
+          <div class="phase-title">Service Wired</div>
+          <div class="phase-items">
+            K8s namespace<br>
+            ArgoCD app<br>
+            Service account<br>
+            Env vars injected<br>
+            Deploy pipeline
+          </div>
+        </div>
+
+        <div class="phase-arrow">→</div>
+
+        <div class="vision-phase">
+          <div class="phase-num">Step 4</div>
+          <div class="phase-icon">🚀</div>
+          <div class="phase-title">First Deploy</div>
+          <div class="phase-items">
+            Initial commit built<br>
+            Image pushed to ECR<br>
+            Deployed to staging<br>
+            Health check passes<br>
+            Engineer notified
+          </div>
+        </div>
+
+      </div>
+
+      <div class="vision-output">
+        <div class="out-line">GitHub repo meetearnest/payments-service created</div>
+        <div class="out-line">legoland project lending-platform-squad/payments-service provisioned</div>
+        <div class="out-line">Postgres databases created: payments-service (staging + production)</div>
+        <div class="out-line">SQS queues created: payments-events-queue (staging + production)</div>
+        <div class="out-line">Vault role payments-service provisioned</div>
+        <div class="out-line">All env0 plans auto-approved (additions only, no risk)</div>
+        <div class="out-line">ArgoCD app payments-service healthy in staging</div>
+        <div class="out-final">payments-service is live in staging — total time: 47 minutes</div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ── SECTION 4: Impact ── -->
+  <section id="impact">
+    <div class="section-label label-amber">Impact</div>
+    <h2>What This Enables</h2>
+
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="metric c-purple">Many → 1</div>
+        <div class="metric-label">Human touchpoints per service onboarding</div>
+        <div class="metric-desc">2 Port approval gates, 2 forms, and conditional env0 approvals — all replaced by a single intent statement.</div>
+      </div>
+      <div class="summary-card">
+        <div class="metric c-green">~80%</div>
+        <div class="metric-label">Terraform plans auto-approved</div>
+        <div class="metric-desc">New resource provisioning is almost always additions-only. Agent classifies and approves safely.</div>
+      </div>
+      <div class="summary-card">
+        <div class="metric c-blue">Days → Hours</div>
+        <div class="metric-label">Time from intent to live service</div>
+        <div class="metric-desc">Eliminating human wait time in the pipeline is the single biggest speedup.</div>
+      </div>
+      <div class="summary-card">
+        <div class="metric c-purple">1 action</div>
+        <div class="metric-label">Replaces 5 separate bash generators</div>
+        <div class="metric-desc">One LLM-powered action handles all resource types. New types added in hours, not days.</div>
+      </div>
+      <div class="summary-card">
+        <div class="metric c-green">Reusable</div>
+        <div class="metric-label">Primitives for other pipelines</div>
+        <div class="metric-desc">The LLM writer and plan reviewer become building blocks for deploy, incident, cost, and security pipelines.</div>
+      </div>
+      <div class="summary-card">
+        <div class="metric c-blue">Foundation</div>
+        <div class="metric-label">For AI-native operations</div>
+        <div class="metric-desc">This is the first infra agentic pipeline at Earnest. The pattern scales to every place humans do coordination work today.</div>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+</div><!-- end tab-main -->
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- TAB 2: Adding a New Resource Type                      -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="tab-new-resource" class="tab-page">
+<div class="page">
+
+  <h1>Adding a New Self-Service Resource Type</h1>
+  <p class="subtitle">What does it take today to expose a new resource type (e.g. ElastiCache, SNS, RDS cluster) as a self-service action in Port? And what does it take after the AI transformation?</p>
+
+  <div class="compare" style="align-items:start; gap:3rem;">
+
+    <!-- ── TODAY ── -->
+    <div class="compare-col col-before">
+      <h3>Today — ~1 to 2 weeks of engineering</h3>
+      <p style="color:#64748b; font-size:.82rem; margin-bottom:1.5rem;">Every new resource type is a fresh engineering project. No shared infrastructure. No reuse. Each step must be built from scratch.</p>
+
+      <div class="flow-section-label" style="background:#fef2f2; color:#dc2626; border:1px solid #fca5a5;">Step-by-step engineering work</div>
+
+      <div class="flow-step">
+        <div class="flow-step-num" style="background:#fde68a; color:#92400e;">1</div>
+        <div class="flow-step-body">
+          <div class="flow-step-title">Write a new bash composite action</div>
+          <div class="flow-step-desc">Author <code style="font-size:.71rem; background:#f1f5f9; padding:.1rem .3rem; border-radius:3px;">actions/create-{resource}/action.yml</code> from scratch. ~500 lines of bash: input validation, file existence checks, grep-and-splice logic for each .tf file the resource needs.</div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+
+      <div class="flow-step">
+        <div class="flow-step-num" style="background:#fde68a; color:#92400e;">2</div>
+        <div class="flow-step-body">
+          <div class="flow-step-title">Write a new orchestrate workflow</div>
+          <div class="flow-step-desc">Author <code style="font-size:.71rem; background:#f1f5f9; padding:.1rem .3rem; border-radius:3px;">orchestrate-{resource}.yml</code> — define all inputs, call the bash action, wire up env0 polling jobs, add Slack notifications for each failure/success state, add DX telemetry.</div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+
+      <div class="flow-step">
+        <div class="flow-step-num" style="background:#fde68a; color:#92400e;">3</div>
+        <div class="flow-step-body">
+          <div class="flow-step-title">Test against a real legoland project</div>
+          <div class="flow-step-desc">Manually run the workflow against a test project. Debug bash string-manipulation edge cases. Verify generated .tf files are valid. Fix indentation issues, heredoc escaping, missing variable blocks.</div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+
+      <div class="flow-step">
+        <div class="flow-step-num" style="background:#fde68a; color:#92400e;">4</div>
+        <div class="flow-step-body">
+          <div class="flow-step-title">Configure Port self-service action</div>
+          <div class="flow-step-desc">Build a new Port action form: define all input fields, map them to workflow inputs, configure the GitHub webhook trigger. Update Port catalog blueprint if needed.</div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+
+      <div class="flow-step">
+        <div class="flow-step-num" style="background:#fde68a; color:#92400e;">5</div>
+        <div class="flow-step-body">
+          <div class="flow-step-title">Write documentation + FAQ</div>
+          <div class="flow-step-desc">Author Confluence page with prerequisites, gotchas, and common failure modes. Engineers need it because the pipeline is opaque.</div>
+        </div>
+      </div>
+      <div class="flow-arrow">↓</div>
+
+      <div class="flow-step">
+        <div class="flow-step-num" style="background:#fde68a; color:#92400e;">6</div>
+        <div class="flow-step-body">
+          <div class="flow-step-title">PR review + merge + monitor rollout</div>
+          <div class="flow-step-desc">Action + workflow PR reviewed by Cloud Platform team. Merged. First few real usages monitored for edge cases missed in testing.</div>
+        </div>
+      </div>
+
+      <div style="margin-top:1.5rem; background:#fff8f8; border:1px solid #fca5a5; border-radius:10px; padding:1rem 1.25rem;">
+        <div style="font-size:.72rem; font-weight:700; color:#dc2626; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.5rem;">What this produces</div>
+        <div style="display:flex; flex-direction:column; gap:.35rem;">
+          <div style="display:flex; align-items:center; gap:.5rem; font-size:.78rem; color:#1e293b;"><span style="color:#dc2626">✕</span> One more ~500-line bash action to maintain</div>
+          <div style="display:flex; align-items:center; gap:.5rem; font-size:.78rem; color:#1e293b;"><span style="color:#dc2626">✕</span> One more orchestrate workflow to maintain</div>
+          <div style="display:flex; align-items:center; gap:.5rem; font-size:.78rem; color:#1e293b;"><span style="color:#dc2626">✕</span> One more Port form to maintain</div>
+          <div style="display:flex; align-items:center; gap:.5rem; font-size:.78rem; color:#1e293b;"><span style="color:#dc2626">✕</span> Fragile to legoland convention changes</div>
+          <div style="display:flex; align-items:center; gap:.5rem; font-size:.78rem; color:#1e293b;"><span style="color:#dc2626">✕</span> Engineer must understand bash + HCL + Port + env0</div>
+        </div>
+      </div>
+
+      <div class="pill-row" style="margin-top:1rem;">
+        <span class="pill pill-red">1–2 weeks per resource type</span>
+        <span class="pill pill-red">~500 lines of bash per type</span>
+        <span class="pill pill-red">No reuse between resource types</span>
+      </div>
+    </div>
+
+    <!-- ── AFTER ── -->
+    <div class="compare-col col-after">
+      <h3>After AI Transformation — ~1 to 2 hours</h3>
+      <p style="color:#64748b; font-size:.82rem; margin-bottom:1.5rem;">The LLM action already exists. The orchestrate workflow already exists. Adding a new resource type is describing what you want — not building new infrastructure to support it.</p>
+
+      <div class="flow-section-label" style="background:#f0fdf4; color:#16a34a; border:1px solid #86efac;">Step-by-step</div>
+
+      <div class="flow-step">
+        <div class="flow-step-num" style="background:#bbf7d0; color:#14532d;">1</div>
+        <div class="flow-step-body">
+          <div class="flow-step-title">Describe the resource to the LLM action</div>
+          <div class="flow-step-desc">Add a brief description of the new resource type to the <code style="font-size:.71rem; background:#f0fdf4; padding:.1rem .3rem; border-radius:3px;">llm-legoland-writer</code> prompt: what it is, what legoland module backs it, what files it needs. The LLM reads existing legoland examples and infers the rest.</div>
+        </div>
+      </div>
+      <div class="flow-arrow" style="color:#86efac;">↓</div>
+
+      <div class="flow-step">
+        <div class="flow-step-num" style="background:#bbf7d0; color:#14532d;">2</div>
+        <div class="flow-step-body">
+          <div class="flow-step-title">Add resource-type to the unified orchestrate workflow</div>
+          <div class="flow-step-desc">The existing <code style="font-size:.71rem; background:#f0fdf4; padding:.1rem .3rem; border-radius:3px;">orchestrate-resource.yml</code> accepts a <code style="font-size:.71rem; background:#f0fdf4; padding:.1rem .3rem; border-radius:3px;">resource-type</code> input. No new workflow needed — just register the new type as a valid value.</div>
+        </div>
+      </div>
+      <div class="flow-arrow" style="color:#86efac;">↓</div>
+
+      <div class="flow-step">
+        <div class="flow-step-num" style="background:#bbf7d0; color:#14532d;">3</div>
+        <div class="flow-step-body">
+          <div class="flow-step-title">Test by running it</div>
+          <div class="flow-step-desc">Trigger the workflow with the new resource type. Review the generated .tf files in the PR. If the output is wrong, refine the description. No bash debugging, no heredoc escaping.</div>
+        </div>
+      </div>
+      <div class="flow-arrow" style="color:#86efac;">↓</div>
+
+      <div class="flow-step">
+        <div class="flow-step-num" style="background:#bbf7d0; color:#14532d;">4</div>
+        <div class="flow-step-body">
+          <div class="flow-step-title">Update Port form (optional)</div>
+          <div class="flow-step-desc">Add the new resource type as an option in the Port form, or accept it as natural language input. Either way, no new Port blueprint needed — the same action handles it.</div>
+        </div>
+      </div>
+
+      <div style="margin-top:1.5rem; background:#f0fdf4; border:1px solid #86efac; border-radius:10px; padding:1rem 1.25rem;">
+        <div style="font-size:.72rem; font-weight:700; color:#16a34a; text-transform:uppercase; letter-spacing:.08em; margin-bottom:.5rem;">What this produces</div>
+        <div style="display:flex; flex-direction:column; gap:.35rem;">
+          <div style="display:flex; align-items:center; gap:.5rem; font-size:.78rem; color:#1e293b;"><span style="color:#22c55e">✓</span> Zero new bash to write or maintain</div>
+          <div style="display:flex; align-items:center; gap:.5rem; font-size:.78rem; color:#1e293b;"><span style="color:#22c55e">✓</span> Zero new workflows to write or maintain</div>
+          <div style="display:flex; align-items:center; gap:.5rem; font-size:.78rem; color:#1e293b;"><span style="color:#22c55e">✓</span> Auto-adapts when legoland conventions change</div>
+          <div style="display:flex; align-items:center; gap:.5rem; font-size:.78rem; color:#1e293b;"><span style="color:#22c55e">✓</span> Engineer only needs to describe intent</div>
+          <div style="display:flex; align-items:center; gap:.5rem; font-size:.78rem; color:#1e293b;"><span style="color:#22c55e">✓</span> Documentation is the PR description, not Confluence</div>
+        </div>
+      </div>
+
+      <div class="pill-row" style="margin-top:1rem;">
+        <span class="pill pill-green">Hours not weeks</span>
+        <span class="pill pill-green">Zero new bash</span>
+        <span class="pill pill-green">Fully reuses existing pipeline</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── TREE VIEW ── -->
+  <div class="section-label label-blue" style="margin-bottom:1rem;">Structure Comparison</div>
+  <h2>How the codebase grows with each new resource type</h2>
+  <p style="color:#64748b; font-size:.88rem; margin-bottom:.75rem;">Each tree shows what exists in the <strong style="color:#1e293b;">github-workflows repo</strong> after adding Postgres, SQS, S3, and a hypothetical new type — ElastiCache.</p>
+  <div style="display:inline-flex; align-items:center; gap:.5rem; background:#f0fdf4; border:1px solid #86efac; border-radius:8px; padding:.4rem 1rem; font-size:.78rem; color:#15803d; margin-bottom:2rem;">
+    <span>✓</span> <strong>legoland is unchanged either way</strong> — files still land in <code style="font-size:.73rem; background:#dcfce7; padding:.1rem .3rem; border-radius:3px;">projects/{squad}/{component}/</code> exactly as today. Only how they're generated changes.
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:start;">
+
+    <!-- TODAY tree -->
+    <div>
+      <div style="font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#dc2626; margin-bottom:1.25rem;">Today — grows linearly with every new type</div>
+
+      <div style="font-family:'SF Mono','Fira Code',monospace; font-size:.78rem; background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:1.5rem; line-height:2;">
+
+        <div style="color:#64748b;">github-workflows/</div>
+        <div style="padding-left:1.25rem; color:#64748b;">.github/workflows/</div>
+        <div style="padding-left:2.5rem; color:#dc2626; font-weight:600;">├── orchestrate-postgresql-database.yml</div>
+        <div style="padding-left:2.5rem; color:#dc2626; font-weight:600;">├── orchestrate-sqs-queues.yml</div>
+        <div style="padding-left:2.5rem; color:#dc2626; font-weight:600;">├── orchestrate-s3-buckets.yml</div>
+        <div style="padding-left:2.5rem; color:#f59e0b; font-weight:600;">└── orchestrate-elasticache.yml &nbsp;<span style="color:#94a3b8; font-size:.7rem; font-weight:400;">← new, must write from scratch</span></div>
+
+        <div style="padding-left:1.25rem; color:#64748b; margin-top:.5rem;">actions/</div>
+        <div style="padding-left:2.5rem; color:#dc2626; font-weight:600;">├── create-postgresql-database/</div>
+        <div style="padding-left:3.75rem; color:#94a3b8;">└── action.yml &nbsp;<span style="font-size:.7rem;">~500 lines bash</span></div>
+        <div style="padding-left:2.5rem; color:#dc2626; font-weight:600;">├── create-sqs/</div>
+        <div style="padding-left:3.75rem; color:#94a3b8;">└── action.yml &nbsp;<span style="font-size:.7rem;">~500 lines bash</span></div>
+        <div style="padding-left:2.5rem; color:#dc2626; font-weight:600;">├── create-s3-bucket/</div>
+        <div style="padding-left:3.75rem; color:#94a3b8;">└── action.yml &nbsp;<span style="font-size:.7rem;">~500 lines bash</span></div>
+        <div style="padding-left:2.5rem; color:#f59e0b; font-weight:600;">└── create-elasticache/ &nbsp;<span style="color:#94a3b8; font-size:.7rem; font-weight:400;">← new, must write from scratch</span></div>
+        <div style="padding-left:3.75rem; color:#94a3b8;">└── action.yml &nbsp;<span style="font-size:.7rem;">~500 lines bash</span></div>
+
+        <div style="margin-top:1rem; padding:0.6rem 0.75rem; background:#fff8f8; border-radius:7px; border:1px solid #fecaca; font-size:.73rem; color:#dc2626; font-family:-apple-system,sans-serif;">
+          Every new resource type: +1 workflow file, +1 action directory, +~500 lines of bash. Scales with engineer time, not intelligence.
+        </div>
+      </div>
+    </div>
+
+    <!-- AFTER tree -->
+    <div>
+      <div style="font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#16a34a; margin-bottom:1.25rem;">After — stays flat regardless of how many resource types</div>
+
+      <div style="font-family:'SF Mono','Fira Code',monospace; font-size:.78rem; background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:1.5rem; line-height:2;">
+
+        <div style="color:#64748b;">github-workflows/</div>
+        <div style="padding-left:1.25rem; color:#64748b;">.github/workflows/</div>
+        <div style="padding-left:2.5rem; color:#16a34a; font-weight:600;">└── orchestrate-resource.yml &nbsp;<span style="color:#94a3b8; font-size:.7rem; font-weight:400;">← handles all types</span></div>
+
+        <div style="padding-left:1.25rem; color:#64748b; margin-top:.5rem;">actions/</div>
+        <div style="padding-left:2.5rem; color:#16a34a; font-weight:600;">├── llm-legoland-writer/</div>
+        <div style="padding-left:3.75rem; color:#94a3b8;">└── action.yml &nbsp;<span style="font-size:.7rem;">reads context, writes any resource</span></div>
+        <div style="padding-left:2.5rem; color:#16a34a; font-weight:600;">└── llm-plan-reviewer/</div>
+        <div style="padding-left:3.75rem; color:#94a3b8;">└── action.yml &nbsp;<span style="font-size:.7rem;">reviews any tofu plan</span></div>
+
+        <div style="margin-top:1.75rem; padding:0.6rem 0.75rem; background:#f0fdf4; border-radius:7px; border:1px solid #bbf7d0; font-size:.73rem; color:#15803d; font-family:-apple-system,sans-serif; line-height:1.6;">
+          Adding ElastiCache (or any new type): describe it in the prompt. No new files. No new workflows. The repo stays exactly this size.
+        </div>
+
+        <div style="margin-top:.75rem; padding:0.6rem 0.75rem; background:#faf5ff; border-radius:7px; border:1px solid #ddd6fe; font-size:.73rem; color:#6d28d9; font-family:-apple-system,sans-serif; line-height:1.6;">
+          <span style="font-weight:700;">When legoland conventions change</span> (new module version, new naming pattern): update the system prompt once. All resource types pick it up automatically. Today: update every bash action individually.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── WORKFLOW SIMPLIFICATION ── -->
+  <div class="section-label label-amber" style="margin-bottom:1rem;">Workflow Simplification</div>
+  <h2>How orchestrate-service-onboarding.yml changes</h2>
+  <p style="color:#64748b; font-size:.88rem; margin-bottom:.75rem;">The job graph stays the same — the same 7 jobs, the same sequencing. What collapses is the <em>content</em> of each job. The complexity that disappears is exactly where the LLM takes over.</p>
+  <div style="display:inline-flex; align-items:center; gap:.5rem; background:#fef3c7; border:1px solid #fde68a; border-radius:8px; padding:.4rem 1rem; font-size:.78rem; color:#92400e; margin-bottom:2rem;">
+    <span>ℹ️</span> Same 7 jobs. Same <code style="font-size:.73rem; background:#fef9c3; padding:.1rem .3rem; border-radius:3px;">needs:</code> sequencing. ~1050 lines → ~300 lines.
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:start;">
+
+    <!-- TODAY -->
+    <div>
+      <div style="font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#dc2626; margin-bottom:1rem;">Today — ~1050 lines</div>
+      <div style="display:flex; flex-direction:column; gap:.5rem;">
+
+        <div style="background:#fff8f8; border:1px solid #fca5a5; border-radius:9px; padding:.8rem 1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.3rem;">
+            <span style="font-size:.8rem; font-weight:700; color:#0f172a;">config</span>
+            <span style="font-size:.68rem; background:#fecaca; color:#dc2626; padding:.1rem .5rem; border-radius:999px; font-weight:600;">~370 lines</span>
+          </div>
+          <div style="font-size:.74rem; color:#64748b; line-height:1.5;">Bash validates every input: env name formats, replica JSON shapes, image names, env var key=value patterns. Exists because Port form data arrives untrustworthy and needs heavy scrubbing.</div>
+        </div>
+
+        <div style="background:#fff8f8; border:1px solid #fca5a5; border-radius:9px; padding:.8rem 1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.3rem;">
+            <span style="font-size:.8rem; font-weight:700; color:#0f172a;">adding-vault-role</span>
+            <span style="font-size:.68rem; background:#fecaca; color:#dc2626; padding:.1rem .5rem; border-radius:999px; font-weight:600;">~170 lines</span>
+          </div>
+          <div style="font-size:.74rem; color:#64748b; line-height:1.5;">Creates Vault role, then also runs <code style="font-size:.71rem; background:#f1f5f9; padding:.1rem .25rem; border-radius:3px;">env0-project-creator</code> and polls for its deployment. Two concerns bundled into one job.</div>
+        </div>
+
+        <div style="background:#fff8f8; border:1px solid #fca5a5; border-radius:9px; padding:.8rem 1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.3rem;">
+            <span style="font-size:.8rem; font-weight:700; color:#0f172a;">legoland-project-pr</span>
+            <span style="font-size:.68rem; background:#fecaca; color:#dc2626; padding:.1rem .5rem; border-radius:999px; font-weight:600;">~200 lines</span>
+          </div>
+          <div style="font-size:.74rem; color:#64748b; line-height:1.5;">Calls <code style="font-size:.71rem; background:#f1f5f9; padding:.1rem .25rem; border-radius:3px;">legoland-project-creator</code> (installs cookiecutter + OpenTofu, cherry-picks config commits with retry loops) then chains <code style="font-size:.71rem; background:#f1f5f9; padding:.1rem .25rem; border-radius:3px;">legoland-infra-files</code> via the <code style="font-size:.71rem; background:#f1f5f9; padding:.1rem .25rem; border-radius:3px;">post-action-uses</code> hack.</div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:9px; padding:.8rem 1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.3rem;">
+            <span style="font-size:.8rem; font-weight:700; color:#0f172a;">setting-arn-as-output</span>
+            <span style="font-size:.68rem; background:#f1f5f9; color:#64748b; padding:.1rem .5rem; border-radius:999px; font-weight:600;">~85 lines</span>
+          </div>
+          <div style="font-size:.74rem; color:#64748b; line-height:1.5;">Fetches env0 Terraform outputs to extract service ARNs. No changes needed.</div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:9px; padding:.8rem 1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.3rem;">
+            <span style="font-size:.8rem; font-weight:700; color:#0f172a;">argo-checking-apps</span>
+            <span style="font-size:.68rem; background:#f1f5f9; color:#64748b; padding:.1rem .5rem; border-radius:999px; font-weight:600;">~45 lines</span>
+          </div>
+          <div style="font-size:.74rem; color:#64748b; line-height:1.5;">Polls ArgoCD until healthy. No changes needed.</div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:9px; padding:.8rem 1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.3rem;">
+            <span style="font-size:.8rem; font-weight:700; color:#0f172a;">notify-on-failure / notify-on-success</span>
+            <span style="font-size:.68rem; background:#f1f5f9; color:#64748b; padding:.1rem .5rem; border-radius:999px; font-weight:600;">~180 lines</span>
+          </div>
+          <div style="font-size:.74rem; color:#64748b; line-height:1.5;">Summarizes failed jobs, Slacks user, posts to DX. No changes needed.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- AFTER -->
+    <div>
+      <div style="font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#16a34a; margin-bottom:1rem;">After — ~300 lines</div>
+      <div style="display:flex; flex-direction:column; gap:.5rem;">
+
+        <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:9px; padding:.8rem 1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.3rem;">
+            <span style="font-size:.8rem; font-weight:700; color:#0f172a;">config</span>
+            <span style="font-size:.68rem; background:#bbf7d0; color:#15803d; padding:.1rem .5rem; border-radius:999px; font-weight:600;">~30 lines</span>
+          </div>
+          <div style="font-size:.74rem; color:#64748b; line-height:1.5;">Agent resolves and validates inputs upstream before triggering the workflow. Config job becomes a thin passthrough — echo inputs, set outputs, done.</div>
+        </div>
+
+        <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:9px; padding:.8rem 1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.3rem;">
+            <span style="font-size:.8rem; font-weight:700; color:#0f172a;">adding-vault-role</span>
+            <span style="font-size:.68rem; background:#bbf7d0; color:#15803d; padding:.1rem .5rem; border-radius:999px; font-weight:600;">~40 lines</span>
+          </div>
+          <div style="font-size:.74rem; color:#64748b; line-height:1.5;">Creates Vault role only. env0 project creation is gone — it's handled as part of the legoland PR that the LLM generates. Concerns are separated cleanly.</div>
+        </div>
+
+        <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:9px; padding:.8rem 1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.3rem;">
+            <span style="font-size:.8rem; font-weight:700; color:#0f172a;">legoland-project-pr</span>
+            <span style="font-size:.68rem; background:#bbf7d0; color:#15803d; padding:.1rem .5rem; border-radius:999px; font-weight:600;">~20 lines</span>
+          </div>
+          <div style="font-size:.74rem; color:#64748b; line-height:1.5;">One call to <code style="font-size:.71rem; background:#dcfce7; padding:.1rem .25rem; border-radius:3px;">llm-legoland-writer</code>. No cookiecutter, no cherry-picking, no retry loops, no <code style="font-size:.71rem; background:#dcfce7; padding:.1rem .25rem; border-radius:3px;">post-action-uses</code> chaining. LLM reads context, writes all files, opens PR.</div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:9px; padding:.8rem 1rem; opacity:.7;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.3rem;">
+            <span style="font-size:.8rem; font-weight:700; color:#0f172a;">setting-arn-as-output</span>
+            <span style="font-size:.68rem; background:#f1f5f9; color:#64748b; padding:.1rem .5rem; border-radius:999px; font-weight:600;">~85 lines — unchanged</span>
+          </div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:9px; padding:.8rem 1rem; opacity:.7;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.3rem;">
+            <span style="font-size:.8rem; font-weight:700; color:#0f172a;">argo-checking-apps</span>
+            <span style="font-size:.68rem; background:#f1f5f9; color:#64748b; padding:.1rem .5rem; border-radius:999px; font-weight:600;">~45 lines — unchanged</span>
+          </div>
+        </div>
+
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:9px; padding:.8rem 1rem; opacity:.7;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.3rem;">
+            <span style="font-size:.8rem; font-weight:700; color:#0f172a;">notify-on-failure / notify-on-success</span>
+            <span style="font-size:.68rem; background:#f1f5f9; color:#64748b; padding:.1rem .5rem; border-radius:999px; font-weight:600;">~180 lines — unchanged</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:1rem; background:#faf5ff; border:1px solid #ddd6fe; border-radius:9px; padding:.8rem 1rem; font-size:.74rem; color:#6d28d9; line-height:1.6;">
+        The three jobs that change account for <strong>~740 lines of complexity</strong> today. After the transformation they're ~90 lines combined. The jobs that don't change — polling, notifications, telemetry — are already clean and stay untouched.
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ── FLOWCHART ── -->
+  <div class="section-label label-purple" style="margin-bottom:1rem;">Decision Flow</div>
+  <h2>What happens when an engineer requests a new resource</h2>
+  <p style="color:#64748b; font-size:.88rem; margin-bottom:2.5rem;">Follow the path from intent to provisioned resource — today vs. after.</p>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:start;">
+
+    <!-- TODAY flowchart -->
+    <div>
+      <div style="font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#dc2626; margin-bottom:1.25rem;">Today</div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0;">
+
+        <div class="tree-node tn-human" style="width:100%; max-width:100%; text-align:left; display:flex; align-items:center; gap:.6rem;">
+          <span>👤</span>
+          <div><div style="font-weight:600;">Engineer opens Port</div><div class="tree-node-sub">Finds the right self-service action for this resource type. If it doesn't exist — stops here.</div></div>
+        </div>
+        <div class="tree-connector-v"></div>
+
+        <div class="tree-node tn-warn" style="width:100%; max-width:100%; text-align:left; display:flex; align-items:center; gap:.6rem;">
+          <span>🔀</span>
+          <div><div style="font-weight:600;">Does a Port action exist for this resource?</div></div>
+        </div>
+
+        <!-- Branch -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; width:100%; margin-top:0;">
+          <div style="display:flex; flex-direction:column; align-items:center; border-right:1px dashed #e2e8f0;">
+            <div style="height:20px; width:2px; background:#fca5a5;"></div>
+            <div style="font-size:.68rem; color:#dc2626; font-weight:700; margin-bottom:.3rem;">NO</div>
+            <div class="tree-node tn-warn" style="width:90%; font-size:.75rem; text-align:center;">
+              File a request with Cloud Platform team
+              <div class="tree-node-sub">Wait 1–2 weeks for new action to be built and reviewed</div>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center;">
+            <div style="height:20px; width:2px; background:#86efac;"></div>
+            <div style="font-size:.68rem; color:#16a34a; font-weight:700; margin-bottom:.3rem;">YES</div>
+            <div class="tree-node tn-auto" style="width:90%; font-size:.75rem; text-align:center;">
+              Fill Port form
+              <div class="tree-node-sub">Look up project name, sub-project, allowed env values</div>
+            </div>
+            <div style="height:16px; width:2px; background:#cbd5e1;"></div>
+            <div class="tree-node tn-human" style="width:90%; font-size:.75rem; text-align:center;">
+              Port approval gate
+              <div class="tree-node-sub">Mandatory — workflow won't start until approved</div>
+            </div>
+            <div style="height:16px; width:2px; background:#cbd5e1;"></div>
+            <div class="tree-node tn-auto" style="width:90%; font-size:.75rem; text-align:center;">
+              Bash action runs
+              <div class="tree-node-sub">Resource-specific script generates .tf files</div>
+            </div>
+            <div style="height:16px; width:2px; background:#cbd5e1;"></div>
+            <div class="tree-node tn-human" style="width:90%; font-size:.75rem; text-align:center;">
+              env0 plan review (if enabled)
+              <div class="tree-node-sub">Context switch to env0 UI — conditional on env0 config</div>
+            </div>
+            <div style="height:16px; width:2px; background:#cbd5e1;"></div>
+            <div class="tree-node tn-eng" style="width:90%; font-size:.75rem; text-align:center;">
+              Resource provisioned ✓
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- AFTER flowchart -->
+    <div>
+      <div style="font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:#16a34a; margin-bottom:1.25rem;">After</div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0;">
+
+        <div class="tree-node tn-human" style="width:100%; max-width:100%; text-align:left; display:flex; align-items:center; gap:.6rem;">
+          <span>💬</span>
+          <div><div style="font-weight:600;">Engineer states intent</div><div class="tree-node-sub">"I need an ElastiCache cluster for payments-service in staging." Natural language, no form.</div></div>
+        </div>
+        <div class="tree-connector-v"></div>
+
+        <div class="tree-node tn-ai" style="width:100%; max-width:100%; text-align:left; display:flex; align-items:center; gap:.6rem;">
+          <span>🤖</span>
+          <div><div style="font-weight:600;">Agent resolves parameters</div><div class="tree-node-sub">Infers project name, environment, confirms intent. Works for any resource type — no pre-built action needed.</div></div>
+        </div>
+        <div class="tree-connector-v"></div>
+
+        <div class="tree-node tn-ai" style="width:100%; max-width:100%; text-align:left; display:flex; align-items:center; gap:.6rem;">
+          <span>📝</span>
+          <div><div style="font-weight:600;">LLM generates OpenTofu files</div><div class="tree-node-sub">Reads legoland context. Writes correct, idiomatic config for this resource type. Works whether this type has been done before or not.</div></div>
+        </div>
+        <div class="tree-connector-v"></div>
+
+        <div class="tree-node tn-auto" style="width:100%; max-width:100%; text-align:left; display:flex; align-items:center; gap:.6rem;">
+          <span>🔀</span>
+          <div><div style="font-weight:600;">PR opened, env0 plans</div><div class="tree-node-sub">Branch created, PR opened against legoland. env0 picks it up automatically.</div></div>
+        </div>
+        <div class="tree-connector-v"></div>
+
+        <div class="tree-node tn-warn" style="width:100%; max-width:100%; text-align:left; display:flex; align-items:center; gap:.6rem;">
+          <span>🔍</span>
+          <div><div style="font-weight:600;">AI classifies plan risk</div></div>
+        </div>
+
+        <!-- Branch -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; width:100%; margin-top:0;">
+          <div style="display:flex; flex-direction:column; align-items:center; border-right:1px dashed #e2e8f0;">
+            <div style="height:20px; width:2px; background:#86efac;"></div>
+            <div style="font-size:.68rem; color:#16a34a; font-weight:700; margin-bottom:.3rem;">LOW RISK</div>
+            <div class="tree-node tn-ai" style="width:90%; font-size:.75rem; text-align:center;">
+              Auto-approved via env0 API
+              <div class="tree-node-sub">Engineer gets plain-English summary, no action needed</div>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center;">
+            <div style="height:20px; width:2px; background:#fca5a5;"></div>
+            <div style="font-size:.68rem; color:#dc2626; font-weight:700; margin-bottom:.3rem;">HIGH RISK</div>
+            <div class="tree-node tn-human" style="width:90%; font-size:.75rem; text-align:center;">
+              Engineer reviews summary + approves
+              <div class="tree-node-sub">Plain-English risk summary, not raw Terraform diff</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:20px; width:2px; background:#cbd5e1; margin:0 auto;"></div>
+        <div class="tree-node tn-eng" style="width:100%; max-width:100%; text-align:center; font-size:.82rem;">
+          Resource provisioned ✓
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</div><!-- end tab-new-resource -->
+
+</body>
+</html>
