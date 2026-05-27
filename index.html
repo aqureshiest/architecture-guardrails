@@ -17,15 +17,14 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { scroll-behavior: smooth; }
 
     body {
       background: var(--bg);
       color: var(--text);
       font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-      font-size: 16px;
-      line-height: 1.7;
+      font-size: 15px;
+      line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       min-height: 100vh;
     }
@@ -37,88 +36,109 @@
     }
 
     header h1 {
-      font-size: 1.6rem;
+      font-size: 1.4rem;
       font-weight: 700;
       color: var(--text);
       letter-spacing: -0.02em;
     }
 
     header p {
-      margin-top: 0.4rem;
+      margin-top: 0.35rem;
       color: var(--muted);
-      font-size: 0.95rem;
+      font-size: 0.875rem;
     }
 
     main {
-      max-width: 860px;
-      margin: 3rem auto;
+      max-width: 780px;
+      margin: 2.5rem auto;
       padding: 0 2rem;
     }
 
     .section-label {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       color: var(--muted);
-      margin-bottom: 1.2rem;
+      margin-bottom: 0.75rem;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-      gap: 1.25rem;
-    }
-
-    .card {
+    table {
+      width: 100%;
+      border-collapse: collapse;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 1.5rem 1.75rem;
-      text-decoration: none;
-      display: block;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      overflow: hidden;
     }
 
-    .card:hover {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-soft);
-    }
-
-    .card-tag {
-      display: inline-block;
+    thead th {
       font-size: 0.68rem;
-      font-weight: 600;
+      font-weight: 700;
       letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      padding: 0.75rem 1.25rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      background: #f8fafc;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+
+    tbody tr:hover { background: var(--accent-soft); }
+
+    tbody td {
+      padding: 0.9rem 1.25rem;
+      vertical-align: middle;
+    }
+
+    .td-title a {
+      font-weight: 600;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+
+    .td-title a:hover { color: var(--accent); }
+
+    .td-desc {
+      color: var(--muted);
+      font-size: 0.825rem;
+      line-height: 1.45;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.07em;
       text-transform: uppercase;
       color: var(--accent);
       background: var(--accent-soft);
       border-radius: 4px;
-      padding: 2px 8px;
-      margin-bottom: 0.75rem;
+      padding: 2px 7px;
+      white-space: nowrap;
     }
 
-    .card h2 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 0.4rem;
-      line-height: 1.4;
-    }
-
-    .card p {
-      font-size: 0.875rem;
+    .td-date {
       color: var(--muted);
-      line-height: 1.55;
+      font-size: 0.8rem;
+      white-space: nowrap;
     }
 
     footer {
       text-align: center;
-      padding: 3rem 2rem;
-      font-size: 0.8rem;
+      padding: 2.5rem 2rem;
+      font-size: 0.78rem;
       color: var(--muted);
       border-top: 1px solid var(--border);
-      margin-top: 4rem;
+      margin-top: 3rem;
     }
   </style>
 </head>
@@ -131,42 +151,51 @@
 
 <main>
   <p class="section-label">All documents</p>
-  <div class="grid">
-
-    <a class="card" href="architecture-guardrails/">
-      <span class="card-tag">Guardrails</span>
-      <h2>Architecture Guardrails</h2>
-      <p>Opinionated engineering guardrails for building high-quality systems — naming, testing, observability, integrations, and more.</p>
-    </a>
-
-    <a class="card" href="infra-ai-improvements/">
-      <span class="card-tag">Proposal</span>
-      <h2>Infra AI Improvements</h2>
-      <p>Automating infrastructure provisioning workflows using AI-assisted tooling and GitHub Actions.</p>
-    </a>
-
-    <a class="card" href="earnest-agents/">
-      <span class="card-tag">Architecture</span>
-      <h2>Earnest Agents</h2>
-      <p>Architecture and design for the auto-engineering agent system — how it works, what it owns, and how it integrates.</p>
-    </a>
-
-    <a class="card" href="avp-laps-poc/">
-      <span class="card-tag">POC</span>
-      <h2>AVP + LAPS POC</h2>
-      <p>Architecture diagram for the LAPS and AVP proof-of-concept integration.</p>
-    </a>
-
-    <a class="card" href="sdlc-improvements/">
-      <span class="card-tag">DX</span>
-      <h2>SDLC Improvements</h2>
-      <p>Developer experience snapshot — prioritized SDLC improvement tasks from the DX initiative.</p>
-    </a>
-
-  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:28%">Title</th>
+        <th>Description</th>
+        <th style="width:12%">Category</th>
+        <th style="width:11%">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="td-title"><a href="architecture-guardrails/">Architecture Guardrails</a></td>
+        <td class="td-desc">Opinionated engineering guardrails — naming, testing, observability, integrations, and more.</td>
+        <td><span class="tag">Guardrails</span></td>
+        <td class="td-date">May 2025</td>
+      </tr>
+      <tr>
+        <td class="td-title"><a href="infra-ai-improvements/">Infra AI Improvements</a></td>
+        <td class="td-desc">Automating infrastructure provisioning workflows using AI-assisted tooling and GitHub Actions.</td>
+        <td><span class="tag">Proposal</span></td>
+        <td class="td-date">May 2025</td>
+      </tr>
+      <tr>
+        <td class="td-title"><a href="earnest-agents/">Earnest Agents</a></td>
+        <td class="td-desc">Architecture and design for the auto-engineering agent system — how it works, what it owns, and how it integrates.</td>
+        <td><span class="tag">Architecture</span></td>
+        <td class="td-date">May 2025</td>
+      </tr>
+      <tr>
+        <td class="td-title"><a href="avp-laps-poc/">AVP + LAPS POC</a></td>
+        <td class="td-desc">Architecture diagram for the LAPS and AVP proof-of-concept integration.</td>
+        <td><span class="tag">POC</span></td>
+        <td class="td-date">May 2025</td>
+      </tr>
+      <tr>
+        <td class="td-title"><a href="sdlc-improvements/">SDLC Improvements</a></td>
+        <td class="td-desc">Developer experience snapshot — prioritized SDLC improvement tasks from the DX initiative.</td>
+        <td><span class="tag">DX</span></td>
+        <td class="td-date">Mar 2026</td>
+      </tr>
+    </tbody>
+  </table>
 </main>
 
-<footer>Earnest Engineering &mdash; v0.1</footer>
+<footer>Earnest Engineering &mdash; v0.2</footer>
 
 </body>
 </html>
