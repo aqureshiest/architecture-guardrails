@@ -858,16 +858,16 @@
         </div>
       </div>
       <p class="section-lead">
-        AI agents are a force multiplier, not a replacement for engineering judgment. Every guardrail in this document becomes more important — not less — when agents are generating code at machine speed.
+        AI agents don't introduce new failure modes. They amplify the ones already in the system — and they amplify quietly. The slow CI you tolerated becomes a deadlock. The review you skimmed becomes a vulnerability. The ownership gap you papered over becomes a post-mortem.
       </p>
 
       <div class="agentic-banner">
-        <h3>The Fundamental Shift</h3>
+        <h3>The Constraint Isn't the Model. It's the Org.</h3>
         <p>
-          The real shift is that <strong>engineers move from primary authors to system designers, context providers, and judgment appliers</strong>.
-          The leverage moves from typing speed to clarity of thinking, quality of constraints, and depth of domain knowledge.
-          An engineer who can articulate precise requirements, design good interfaces, and identify subtle errors in generated code
-          is dramatically more productive with AI than one who cannot. <strong>Good engineering fundamentals matter more, not less.</strong>
+          The real question isn't whether AI writes good code. It's whether your system can absorb code at this volume without losing the plot.
+          Engineers shift from primary authors to <strong>system designers, context providers, and judgment appliers</strong>.
+          The leverage moves from typing speed to clarity of thinking — but only if the SDLC around them is ready to hold the weight.
+          <strong>Build the system that earns the leverage. Don't hand out keys ahead of it.</strong>
         </p>
       </div>
 
@@ -911,50 +911,55 @@
 
       <div class="card-grid">
         <div class="card">
-          <h3>📝 Context Is the Primary Input</h3>
-          <p>An agent's output quality is bounded by the quality of context it receives. Vague instructions produce generic, often wrong code; precise context produces work that fits the codebase.</p>
+          <h3>🏗 The System Has to Earn the Leverage</h3>
+          <p>Every latent weakness in the SDLC — flaky tests, slow pipelines, ambiguous ownership — stops being a papercut and becomes load-bearing the day agents start landing PRs at machine speed. Ramp access with the system's capacity, not with engineer demand.</p>
           <ul>
-            <li>Agent context files are the most important documentation you'll write — domain glossary, architecture decisions, patterns to follow and avoid</li>
-            <li>Treat them as code: versioned, reviewed, kept current. Stale context produces stale output</li>
-            <li>Scope context to the task — a focused brief beats dumping the entire system design</li>
+            <li>CI you trust under 10 minutes — anything slower collapses into review-by-thumbs</li>
+            <li>Tests that actually catch regressions — agents pass weak tests by writing weak code</li>
+            <li>CODEOWNERS that names someone who'll pick up the phone — fuzzy ownership stops being benign</li>
+            <li>Observability that catches what review misses — silent regressions compound at PR throughput</li>
+            <li>Agent context files treated as code, not lore — stale context produces stale output, confidently</li>
           </ul>
         </div>
 
         <div class="card">
-          <h3>🎯 TDD as the AI Harness</h3>
-          <p>TDD is the most effective constraint for AI-generated code. The test suite becomes the specification the agent must satisfy, not guess at.</p>
+          <h3>👁 Plausible Is Not Correct</h3>
+          <p>AI output reads with the cadence of a senior engineer regardless of whether it's right. The clean prose, the confident naming, the well-formatted diff — all of it removes the visual friction that normally triggers careful reading. The instinct to skim grows. The cost of skimming grows faster.</p>
           <ul>
-            <li>Write or approve tests before asking the agent to implement</li>
-            <li>AI agents will write tests that pass by doing the wrong thing — mutation testing catches this</li>
-            <li>Vibe-checking that generated code looks right is not a substitute for a test suite</li>
+            <li>Review the diff, not the prompt — what shipped is what matters</li>
+            <li>If you can't explain why a change is needed, you can't approve it</li>
+            <li>Watch for invented APIs, hallucinated conventions, plausible-but-wrong logic, unnecessary abstraction</li>
+            <li>Push back on PR size — long PRs get harder to review at the same rate they get easier to generate</li>
+            <li>Mutation testing on AI-touched code — agents will pass tests by doing the wrong thing, and you'll never know</li>
           </ul>
         </div>
 
         <div class="card">
-          <h3>👁 Reviewing AI Output</h3>
-          <p>AI code looks confident and well-formatted regardless of correctness. The clean appearance removes the visual cues that normally trigger careful reading.</p>
+          <h3>🎯 Different Code, Different Leashes</h3>
+          <p>A bad refactor wastes an afternoon. A bad migration takes down production. Treating all AI work the same flattens that distinction, and the flattening always tilts toward more risk, not less. Encode the rules; don't rely on memory.</p>
           <ul>
-            <li>Review AI PRs at least as critically as a junior engineer's — more carefully for security-sensitive code</li>
-            <li>Watch for plausible-but-wrong logic, insecure defaults, invented conventions, unnecessary abstraction</li>
-            <li>Never approve AI-generated infrastructure, migration, or security code without deep review</li>
+            <li>Reasonable to delegate: tests, in-file refactors, doc updates, mechanical changes with clear acceptance criteria</li>
+            <li>Requires human design: migrations, infra, secrets, auth, public APIs, anything crossing service boundaries</li>
+            <li>Use CODEOWNERS and branch protection to enforce — convention does not survive contact with velocity</li>
+            <li>Agents work on branches, never on main. Auto-merge from AI is a red line, not a configuration option</li>
           </ul>
         </div>
 
         <div class="card">
-          <h3>🔒 Accountability &amp; Safety</h3>
-          <p>The fact that code was generated by an AI does not change who is responsible for it. The engineer who approved the PR owns the outcome.</p>
+          <h3>🔒 The AI Didn't Write It. You Did.</h3>
+          <p>The model didn't get paged. You did. The model isn't in the post-mortem. You are. Accountability doesn't transfer to the tool, no matter how capable the tool gets — and the org's job is to make that accountability honest by gating access on readiness, not on requests.</p>
           <ul>
-            <li>"The AI wrote it" is not an explanation in a post-mortem</li>
-            <li>Agents operate on branches, never directly on main. Auto-merge from AI is a red line</li>
-            <li>AI models reproduce vulnerabilities from training data — SAST on every AI PR, always</li>
-            <li>Prompt injection: agents that process untrusted input can be manipulated via that input</li>
+            <li>"The AI wrote it" is not an explanation. Ever</li>
+            <li>Access ramps with the system's capacity to absorb it — the gate is operational, not political</li>
+            <li>SAST, dependency scanning, prompt-injection awareness on every AI-touched PR — non-negotiable</li>
+            <li>Measure escape rate to prod, not PR throughput — volume is not a virtue</li>
           </ul>
         </div>
       </div>
     </section>
 
     <footer>
-      Earnest Architecture Guardrails &nbsp;·&nbsp; Living document — update as patterns emerge &nbsp;·&nbsp; v0.4
+      Earnest Architecture Guardrails &nbsp;·&nbsp; Living document — update as patterns emerge &nbsp;·&nbsp; v0.5
     </footer>
 
   </main>
